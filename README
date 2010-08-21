@@ -1,0 +1,15 @@
+#=============================================================
+#=== LICENSED UNDER AGPLv3
+#=== (C) WebNuLL ( babciastefa [ at ] gmail [ dot ] com )
+#=== http://github.com/webnull/OpenWikiBlog
+#=============================================================
+
+
+libtranslator:
++ Supports loading translations from files and storing it in memory
+
+libsmarty:
+* Fixed notification type from ERROR to INFO for display()
+
+tuxKernel:
+* Changed from isset to isLoaded to check if module is loaded in to kernel in modprobe()
