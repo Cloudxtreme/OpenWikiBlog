@@ -9,6 +9,12 @@ $DB=array('host' => 'localhost',
 # SITE CONFIGURATION
 $CFG=array('site_id' => 'example', 'error_handler' => 'exceptions');
 
+# ===== DEFAULT MODULES REQUIRED TO "RUN ON DEMAND" FUNCTION
+$DEFMODS = array();
+$DEFMODS['tpl'] = 'smarty';
+$DEFMODS['alang'] = 'translator';
+$DEFMODS['error_handler'] = 'exceptions';
+
 # MODULES TO RUN WITH PARAMETRS
 $MODS=array();
 // ===== tuxKernel Hardened Patch is disabled by default, but you can easily enable it

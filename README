@@ -4,12 +4,33 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+23.08.2010:
+	libmenu:
+	+ Added support for only one language websites
 
-libtranslator:
-+ Supports loading translations from files and storing it in memory
+	libmypage:
+	+ Added support for only one language websites
 
-libsmarty:
-* Fixed notification type from ERROR to INFO for display()
+	tuxKernel:
+	+ "Module on Demand" function, allow to avoid critical errors when there is no library loaded yet
+	+ Database error handler, stops the execution of web application when detect an connection error
 
-tuxKernel:
-* Changed from isset to isLoaded to check if module is loaded in to kernel in modprobe()
+	MySQL driver:
+	+ Added support for mysqli->connection_error in DB->error()
+
+22.08.2010:
+	tuxKernelHardenedPatch:
+	+ Added support for SCRIPT, SQL INJECTION, FILE INSERTING/INCLUDING
+
+	libtranslator:
+	+ Supports loading translations from files and storing it in memory
+
+	libsmarty:
+	* Fixed notification type from ERROR to INFO for display()
+
+	tuxKernel:
+	* Changed from isset to isLoaded to check if module is loaded in to kernel in modprobe()
+
+21.08.2010:
+	Project is starting
+	+ There are many things undocummented, sorry

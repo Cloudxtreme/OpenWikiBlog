@@ -237,6 +237,10 @@ class tuxMyDB
 
 	public function error()
 	{
+		// if error is serious
+		if ( !empty ( $this -> Socket -> connect_error ) )
+			return $this->Socket->connect_error;
+
 		return $this -> Socket -> error;
 	}
 }

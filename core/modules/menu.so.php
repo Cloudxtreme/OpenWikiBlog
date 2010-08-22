@@ -14,9 +14,26 @@ class libmenu extends KernelModule
 		$this->state = 'ready';
 		$this->tpl = &$Kernel->tpl;
 		$this->alang = &$Kernel->alang;
+		$this->Site = addslashes($_GET['site']);
 
-		$this->alang->loadTranslation('menu');
-		$this->tpl->assign('menu', $this->alang->menu);
+		//# ==== IF TRANSLATION MODULE IS NOT LOADED, WE WILL TRY TO USE DEFAULT MENU FROM SERIALIZED ARRAY IN FILE
+		if ( !is_object ( $Kernel->alang ) )
+		{
+			if ( is_file ( 'websites/' .$this->Site. '/core/menu.conf.php' ) )
+			{
+				$MenuList = unserialize(file_get_contents ( 'websites/' .$this->Site. '/core/menu.conf.php' ));
+			} else {
+				$MenuList = array ( 0 => array ( 'title' => 'No Menu file found', 'link' => '#' ) );
+				$this->Debug->logString ( 'menu.so.php::E_ERROR::init: No Menu file found in \'websites/' .$this->Site. '/core/menu.conf.php\'');
+			}
+		} else {
+
+			//# ===== GET THE MENU FROM TRANSLATION
+			$this->alang->loadTranslation('menu');
+			$MenuList = $this->alang->menu;	
+		}
+		
+		$this->tpl->assign('menu', $MenuList);
 	}
 }
 ?>

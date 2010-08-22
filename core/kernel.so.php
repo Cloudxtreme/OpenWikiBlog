@@ -4,17 +4,31 @@ class tuxKernel
 	public $Mods=array();
 	public $SQL; # WE WILL KEEP DATABASE OBJECT HERE...
 	private $CFG;
-	protected $Version='tuxKernel 0.18';
+	protected $Version='tuxKernel 0.20';
 	private $Apps;
 
-	public function __construct ( &$CFG, &$MODS, &$HTML )
+	public function __construct ( &$CFG, &$MODS, &$HTML, &$DEFMODS )
 	{
-		$this -> CFG = array ( 'CFG' => $CFG, 'MODS' => $MODS, 'HTML' => $HTML );
+		$this -> CFG = array ( 'CFG' => $CFG, 'MODS' => $MODS, 'HTML' => $HTML, 'DEFMODS' => $DEFMODS );
 	}
 
+	//# KEEP THIS FUNCTION SMALL AND FASTER, BECAUSE ITS CALLED ALL TIMES USING KERNEL
 	public function __get ( $Mod )
 	{
 		$tryCFG = substr($Mod, 1, strlen($Mod));
+
+		// ==== DEFAULT MODULE ON DEMAND
+		if ( !isset ( $this -> Apps [ $Mod ] ) )
+		{
+			if ( isset ( $this -> CFG ['DEFMODS'][$Mod] ) )
+				$this->modprobe ( $this -> CFG ['DEFMODS'][$Mod], '' );
+		}
+
+		// ==== MODULE ON DEMAND FUNCTION
+		if ( is_file ( 'core/modules/' .$Mod. '.so.php' ) AND !isset ( $this->Mods[$Mod] )  )
+		{
+			$this->modprobe($Mod, '');
+		}
 
 		if ( isset ( $this->Mods[$Mod] ) )
 		{
@@ -117,6 +131,11 @@ class tuxKernel
 	{
 		if ( !is_object ( $this -> SQL ) )
 		{
+			if ( $SQL -> error() != '' )
+			{
+				die ( 'OOPS! Contact administrator! Database error: ' .$SQL->error());
+			}
+
 			$this -> SQL = $SQL;
 			return true;
 		}
