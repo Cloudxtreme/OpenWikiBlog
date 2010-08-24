@@ -94,7 +94,8 @@ class libexceptions extends KernelModule
 					'post' => $_POST,
 					'server' => $_SERVER,
 					'cookie' => $_COOKIE,
-					'session' => $_SESSION ) );
+					'session' => $_SESSION,
+					'error' => $RID ) );
 
 		$fp = @fopen ( 'data/crash/' .$LOG_ID. '.txt', 'w' );
 		@fwrite ( $fp, $Report );

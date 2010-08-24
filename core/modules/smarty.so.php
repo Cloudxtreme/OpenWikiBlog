@@ -1,4 +1,6 @@
 <?php
+### Smarty implementation FOR tuxKernel by WebNuLL
+### Licensed under AGPLv3 ( Affero GPLv3 )
 # libmenu, no dependencies yet :-)
 $EXT_INF = array ( 'classname' => 'libsmarty' );
 

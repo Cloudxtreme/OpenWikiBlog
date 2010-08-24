@@ -1,7 +1,7 @@
 <?php
 class tuxKernel
 {
-	public $Mods=array();
+	private $Mods=array();
 	public $SQL; # WE WILL KEEP DATABASE OBJECT HERE...
 	private $CFG;
 	protected $Version='tuxKernel 0.20';
@@ -10,6 +10,11 @@ class tuxKernel
 	public function __construct ( &$CFG, &$MODS, &$HTML, &$DEFMODS )
 	{
 		$this -> CFG = array ( 'CFG' => $CFG, 'MODS' => $MODS, 'HTML' => $HTML, 'DEFMODS' => $DEFMODS );
+	}
+
+	public function ReturnSelfDumped()
+	{
+		return array ( 'private:apps' => $this->$Apps, 'protected:Version' => $this->Version, 'private:Mods' => $this->Mods);
 	}
 
 	//# KEEP THIS FUNCTION SMALL AND FASTER, BECAUSE ITS CALLED ALL TIMES USING KERNEL
