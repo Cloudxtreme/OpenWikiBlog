@@ -4,7 +4,23 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+25.08.2010:
+	tuxKernel:
+	+ Added ReturnSelfDumped() whih allows read-only access to private and protected variables for debugging purposes
+	* Fixed privigles on $Mods variable in Kernel to prevent overwriting from external module
+
+	libexceptions:
+	* Fixed Kernel memory saving
+	+ Added error string in HTML format to raport
+
+	index:
+	* Fixed calls to error handler
+
 23.08.2010:
+	libadmin:
+	+ Admin module for authentication, and other tasks simple and advanced
+
+22.08.2010:
 	libmenu:
 	+ Added support for only one language websites
 
@@ -18,7 +34,7 @@
 	MySQL driver:
 	+ Added support for mysqli->connection_error in DB->error()
 
-22.08.2010:
+21.08.2010:
 	tuxKernelHardenedPatch:
 	+ Added support for SCRIPT, SQL INJECTION, FILE INSERTING/INCLUDING
 
@@ -31,6 +47,6 @@
 	tuxKernel:
 	* Changed from isset to isLoaded to check if module is loaded in to kernel in modprobe()
 
-21.08.2010:
+20.08.2010:
 	Project is starting
 	+ There are many things undocummented, sorry

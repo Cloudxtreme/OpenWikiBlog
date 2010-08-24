@@ -11,7 +11,7 @@ include ( 'websites/' .$SITE. '/core/config.php' );
 
 # DB and CFG variables will not be duplicated, there is a reference at class function
 
-$Kernel = new tuxKernel ( $CFG, $MODS, $HTML );
+$Kernel = new tuxKernel ( $CFG, $MODS, $HTML, $DEFMODS );
 $SQL = new tuxMyDB ( $DB, $CFG, $Kernel );
 
 # TRY TO LOAD EXCEPTIONS MODULE, IF NOT WE MUST SHOW ALERT BUT WE CANT DO ANYTHING HERE BECAUSE SYSTEM IS HALTED
@@ -43,13 +43,13 @@ if ( is_array ( $MODS ) )
 	catch ( Exception $e )
 	{
 		
-		$Error = $Kernel -> Mods['exceptions'] -> Analyze ( $e );
+		$Error = $Kernel -> error_handler -> Analyze ( $e );
 
 		$Errors[] = &$Error;
 
 		if ( $Error [ 'nice' ] < -4 )
 		{
-			$Kernel -> Mods['exceptions'] -> TriggerCrash ( $Errors );
+			$Kernel -> error_handler -> TriggerCrash ( $Errors );
 		}
 
 	}
