@@ -4,6 +4,26 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+30.08.2010:
+	libmenu:
+	+ Added support for hooking menu translations and menu list from array ( without translation )
+
+	libmypage:
+	+ Added support for "CallThroughtKernel", now displaying page is called from config.php ( $MODS variable ) at startup
+
+	libsmarty:
+	* Fixed FixParams() where was no argument's given
+
+	tuxKernel:
+	- Removed dependencies support for modules, there is another *FASTER* and *BETTER* way to resolve dependencies
+	+ Module triggers, configurable in config.php as parametrs ( array index: k_TRIGGERS )
+	* Optimalized modprobe() code removing some ifs
+	* Optimalized __get() removing white spaces
+	+ "CallThroughtKernel" added, now there is possibility to call module functions throught startup ( config.php )
+
+	libhooks:
+	+ Adding and executing hooks
+
 25.08.2010:
 	tuxKernel:
 	+ Added ReturnSelfDumped() whih allows read-only access to private and protected variables for debugging purposes

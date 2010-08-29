@@ -1,7 +1,8 @@
 <?php
 ### HARDENED PATCH FOR tuxKernel by WebNuLL
 ### Licensed under AGPLv3 ( Affero GPLv3 )
-# libmenu, no dependencies yet :-)
+### http://wiki.github.com/webnull/OpenWikiBlog/
+
 $EXT_INF = array ( 'classname' => 'KernelHardenedPatch');
 
 class KernelHardenedPatch extends KernelModule
@@ -28,8 +29,6 @@ class KernelHardenedPatch extends KernelModule
 
 		if ( $Params['cookie'] == true )
 			$_COOKIE = $this->ScanArray($_COOKIE);
-
-		print_r ( $_GET );
 	}
 
 	private function ScanArray ( $Array )
@@ -65,7 +64,7 @@ class KernelHardenedPatch extends KernelModule
 			
 		} elseif ( $this -> Params['script'] == true ) {
 			// XSS simple injection
-			$Disallowed = array_merge($Disallowed, array ( '<script', '<?php' ) );		
+			$Disallowed = array_merge($Disallowed, array ( '<script', '<?php' ) );
 		}
 
 		if ( $this -> Params ['sql'] == true OR $this -> Params ['script'] == true )
@@ -82,6 +81,7 @@ class KernelHardenedPatch extends KernelModule
 		return $String;
 	}
 
+	// this function was copied from public code snipped, dont remember source but its very simple code :)
 	private function stristr_array( $haystack, $needle ) 
 	{
 		if ( !is_array( $haystack ) ) {

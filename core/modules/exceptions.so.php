@@ -1,5 +1,8 @@
 <?php
-# libmenu, no dependencies yet :-)
+### Debugger and error handler FOR tuxKernel by WebNuLL
+### Licensed under AGPLv3 ( Affero GPLv3 )
+# http://wiki.github.com/webnull/OpenWikiBlog/
+
 $EXT_INF = array ( 'classname' => 'libexceptions' );
 
 class libexceptions extends KernelModule

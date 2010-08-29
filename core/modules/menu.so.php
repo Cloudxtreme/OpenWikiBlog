@@ -1,5 +1,8 @@
 <?php
-# libmenu, no dependencies yet :-)
+### Simple page loader FOR tuxKernel by WebNuLL
+### Licensed under AGPLv3 ( Affero GPLv3 )
+# http://wiki.github.com/webnull/OpenWikiBlog/
+
 $EXT_INF = array ( 'classname' => 'libmenu');
 
 class libmenu extends KernelModule
@@ -15,22 +18,30 @@ class libmenu extends KernelModule
 		$this->tpl = &$Kernel->tpl;
 		$this->alang = &$Kernel->alang;
 		$this->Site = addslashes($_GET['site']);
+		$TranslationName = 'menu';
+
+		// if another plugin wants to change the menu, this is the option
+		$Kernel -> hooks -> start_hook ( 'menu_translation', $TranslationName );
 
 		//# ==== IF TRANSLATION MODULE IS NOT LOADED, WE WILL TRY TO USE DEFAULT MENU FROM SERIALIZED ARRAY IN FILE
 		if ( !is_object ( $Kernel->alang ) )
 		{
 			if ( is_file ( 'websites/' .$this->Site. '/core/menu.conf.php' ) )
 			{
-				$MenuList = unserialize(file_get_contents ( 'websites/' .$this->Site. '/core/menu.conf.php' ));
+				$MenuList = unserialize(file_get_contents ( 'websites/' .$this->Site. '/modules/libmenu/user-menu.php' ));
+
+				// binding to change menu by other plugins
+				$Kernel -> hooks -> start_hook ( 'menu_array', $MenuList );
 			} else {
 				$MenuList = array ( 0 => array ( 'title' => 'No Menu file found', 'link' => '#' ) );
-				$this->Debug->logString ( 'menu.so.php::E_ERROR::init: No Menu file found in \'websites/' .$this->Site. '/core/menu.conf.php\'');
+				$this->Debug->logString ( 'menu.so.php::E_ERROR::init: No Menu file found in \'websites/' .$this->Site. '/modules/libmenu/menu.conf.php\'');
 			}
 		} else {
 
 			//# ===== GET THE MENU FROM TRANSLATION
-			$this->alang->loadTranslation('menu');
-			$MenuList = $this->alang->menu;	
+			$this->alang->loadTranslation($TranslationName);
+			echo "Using translation: $TranslationName";
+			$MenuList = $this->alang->$TranslationName;	
 		}
 		
 		$this->tpl->assign('menu', $MenuList);

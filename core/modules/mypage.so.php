@@ -9,7 +9,7 @@ class libmypage extends KernelModule
 {
 	# this is a plugin current state, kernel must check if the module is ready to use
 	public $state='module not ready';
-	private $Debug, $tpl, $DB, $Version='libmypage 1.1', $alang;
+	private $Debug, $tpl, $DB, $Version='libmypage 1.1', $alang, $tplfile;
 
 	public function __construct ( $Params, &$Kernel )
 	{
@@ -72,7 +72,8 @@ class libmypage extends KernelModule
 			$this->Debug->logString ( $this->Version. '::E_ERROR::init: 404 error, page ID:' .intval($_GET['page']). ' not found.');
 		}
 
-		$this -> tpl -> display ( $TPL_FILE );
+		//$this -> tpl -> display ( $TPL_FILE );
+		$this->tplfile=$TPL_FILE;
 	}
 
 	public function checkForPage ( &$Page, $SITE )
@@ -87,6 +88,12 @@ class libmypage extends KernelModule
 		}
 
 		return $INC_FILE;
+	}
+
+	public function display ()
+	{
+		$this->tpl->display($this->tplfile);
+		return true;
 	}
 }
 ?>

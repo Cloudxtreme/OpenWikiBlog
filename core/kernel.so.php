@@ -4,7 +4,7 @@ class tuxKernel
 	private $Mods=array();
 	public $SQL; # WE WILL KEEP DATABASE OBJECT HERE...
 	private $CFG;
-	protected $Version='tuxKernel 0.20';
+	protected $Version='tuxKernel 0.24';
 	private $Apps;
 
 	public function __construct ( &$CFG, &$MODS, &$HTML, &$DEFMODS )
@@ -18,39 +18,40 @@ class tuxKernel
 	}
 
 	//# KEEP THIS FUNCTION SMALL AND FASTER, BECAUSE ITS CALLED ALL TIMES USING KERNEL
-	public function __get ( $Mod )
+	public function __get ($Mod)
 	{
 		$tryCFG = substr($Mod, 1, strlen($Mod));
 
 		// ==== DEFAULT MODULE ON DEMAND
-		if ( !isset ( $this -> Apps [ $Mod ] ) )
+		if (!isset($this->Apps[$Mod]))
 		{
-			if ( isset ( $this -> CFG ['DEFMODS'][$Mod] ) )
-				$this->modprobe ( $this -> CFG ['DEFMODS'][$Mod], '' );
+			if (isset($this->CFG['DEFMODS'][$Mod]))
+				$this->modprobe($this->CFG['DEFMODS'][$Mod], '');
 		}
 
+		// ==== THIS IS SOLUTION FOR DEPENDENCIES, SO THE DEPENDENCIES OPTION WAS REMOVED
 		// ==== MODULE ON DEMAND FUNCTION
-		if ( is_file ( 'core/modules/' .$Mod. '.so.php' ) AND !isset ( $this->Mods[$Mod] )  )
+		if (is_file('core/modules/' .$Mod. '.so.php') AND !isset($this->Mods[$Mod]))
 		{
 			$this->modprobe($Mod, '');
 		}
 
-		if ( isset ( $this->Mods[$Mod] ) )
+		if (isset($this->Mods[$Mod]))
 		{
 			# return aceess to module
 			return $this->Mods[$Mod];
 
-		} elseif ( isset ( $CFG[$tryCFG] ) ) 
+		} elseif (isset($CFG[$tryCFG])) 
 		{
 			# will return configuration
 			return $CFG[$tryCFG];
 
-		} elseif ( isset ( $this-> Apps [ $Mod ] ) ) {
+		} elseif (isset($this->Apps[$Mod])){
 					
-			# default apps	
+			# default apps
 			$APP = $this->Apps[$Mod];
 		
-			return $this->Mods [$APP];
+			return $this->Mods[$APP];
 		}
 	}
 
@@ -59,27 +60,80 @@ class tuxKernel
 		return $this->Version;
 	}
 
+	// ==== THIS FUNCTION WILL CHECK TRIGGERS IN ARGUMENTS AND RETURN TRUE IF MODULE WILL BE LOADED, FALSE WHEN NOT
+	private function checkParams ( &$Params )
+	{
+		// ==== On k_TRIGGERS we will operate
+		// ==== Our array looks like Params [ param1, param2, k_TRIGGERS[1 = [ 1='1' 2='1' ]] ]
+		if (is_array($Params['k_TRIGGERS']))
+		{
+			// init variable to avoid errors, its a good thing like in c, c++ and other fast languages
+			$True=0;
+
+			foreach ($Params['k_TRIGGERS'] as $Key => $Value)
+			{
+				// ==== k_TRIGGERS[1 = [ 1='1' 2='1' ]], in easy way in PHP: k_TRIGGERS[1] = array ( 1 => 1, 2 => 1)
+				// ==== AND IF First index equals secound index we have a match
+				if ($Value[1] == $Value[2])
+				{
+					$True++;
+				}
+			}
+
+			// if matches are at 100%
+			if ($True == count($Params['k_TRIGGERS']))
+			{
+				return true;
+			}
+
+		} else {
+			// there are no arguments to parse, module will always load without need to any trigger
+			return true;
+		}
+	}
+
 	# LOAD OUR MODULE
 	public function modprobe ( $Module, $Params='' )
 	{
+		// ==== CALLING SUPPORT THROUGH KERNEL MODPROBE FUNCTION
+		if (is_int($Module))
+		{
+			return $this->CallThroughtKernel(&$Params);
+		}
+
+		// external function will decide if we are continuing to load the module
+		if (!$this->checkParams($Params))
+		{
+			return false;
+		}
+
 		if ( $this -> isLoaded ( $Module ) )
 		{
 			throw new Exception ( 'tuxKernel::E_NOTICE::modprobe:: *Notice*: Module "' .$Module. '" already loaded.', 4 );
+			// we will cancel it, because it can erase whole data, use rmmod and re-modprobe instead
+			return false;
 		}
 
+		/*
+		 * KERNEL OPTIMALIZATIONS
+		 *
 		if ( !is_file ( 'core/modules/' .$Module. '.so.php' ) )
 		{
 			throw new Exception ( 'tuxKernel::E_ERROR::modprobe:: *Warning*: Module "' .$Module. '" not found.', 3 );
 			return false;	
-		}
+		}*/
 
-		include ( 'core/modules/' .$Module. '.so.php' );
+		@include ( 'core/modules/' .$Module. '.so.php' ); // faster solution is to add "@"
 
+		/*
+		 * KERNEL OPTIMALIZATIONS
+		 *
 		if ( !isset ( $EXT_INF ) )
 		{
 			throw new Exception ( 'tuxKernel::E_ERROR::modprobe:: *Warning*: No information present about module "' .$Module. '"', 1 );
 			return false;
 		} 
+		*/
 
 		if ( !class_exists ( $EXT_INF [ 'classname'] ) )
 		{
@@ -87,15 +141,16 @@ class tuxKernel
 			return false;
 		}
 
+		//# ==== DEPENDENCY SUPPORT IS CANCELED, THERE IS ANOTHER *FASTER* WAY TO RESOLVE DEPENDENCIES AND LOAD IT WHEN THEY ARE NEEDED
 		# IF THE MODULE NEED ANY OTHER MODULE?
-		if ( isset ( $EXT_INF['depends'] ) AND is_array ( $EXT_INF['depends'] ) )
-		{
-			if ( $this -> loadDeps ( $EXT_INF['depends'] ) == false )
-			{
-				throw new Exception ('tuxKernel::E_ERROR::modprobe:: *Warning*: Failed resolving dependencies for module "' .$Module. '"', 7 );
-				return false;
-			}
-		}
+		#if ( isset ( $EXT_INF['depends'] ) AND is_array ( $EXT_INF['depends'] ) )
+		#{
+			#if ( $this -> loadDeps ( $EXT_INF['depends'] ) == false )
+			#{
+			#	throw new Exception ('tuxKernel::E_ERROR::modprobe:: *Warning*: Failed resolving dependencies for module "' .$Module. '"', 7 );
+			#	return false;
+			#}
+		#}
 
 		# LOAD THE WHOLE MODULE, YES WE FINISH CHECKING IT HERE!
 		$this->Mods[$Module] = new $EXT_INF['classname']($Params, $this);
@@ -112,6 +167,28 @@ class tuxKernel
 		}
 	}
 
+	private function CallThroughtKernel ($Params)
+	{
+		// speed up the kernel, this if is not needed - there is method_exists() to check if function is valid
+		// selected module is not loaded
+		/*if (!$this->isLoaded($Params[1]))
+		{
+			return false;
+		}*/
+
+		if (!method_exists($this->Mods[$Params[0]], $Params[1]))
+		{
+			$this -> error_handler -> logString ( 'kernel.so.php::E_ERROR::CallThroughtKernel: ' .$Params[0]. '::' .$Params[1]. '('.gettype($Params[2]).') - method not found.');
+			return false;
+		}
+
+		$method=$Params[1]; // method name
+		$this->Mods[$Params[0]]->$method($Params[2]); // index no. 0 is class name, and no. 2 is arguments in array
+		
+	}
+
+	/*
+	//# ===== DEPENDENCY SUPPORT IS CANCELED, ITS TOO SLOWLY - THERE IS ANOTHER FASTER WAY TO RESOLVE DEPENDENCIES
 	# this private function will load dependencies for modprobe
 	private function loadDeps ( &$arDepends )
 	{
@@ -122,7 +199,7 @@ class tuxKernel
 				# LOAD MODULE "$Key" WITH "$Value" parametrs
 				if ( $this -> modprobe ( $Key, $Value ) == false )
 				{
-					throw new Exception ( 'tuxKernel::E_ERROR::loadDeps:: *Warning*: Cannot load dependency file "' .$Key. '"', 6 );
+					throw new Exception ( 'tuxKernel::E_ERROR::loadDeps:: *Warning*: Cannot load dependency file "' .$Key. '"', 6 );#
 					return false;
 				}
 			}
@@ -130,6 +207,7 @@ class tuxKernel
 			return true;
 		}
 	}
+	*/
 
 	# LINK MYSQL CLASS TO KERNEL - CONNECT KERNEL AND ITS MODULES TO DATABASE
 	public function connect ( &$SQL )
@@ -167,6 +245,7 @@ class tuxKernel
 		{
 			unset ( $this -> Mods [ $Module ] );
 
+			// ==== TO AVOID HUGE CRASH WE MUST HAVE IF ERROR_HANDLER IS LOADED
 			if ( isset ( $this->Apps['error_handler'] ) )
 			{
 				$this -> error_handler -> logString ( 'kernel.so.php::E_INFO::rmmod: ' .$Module. ' unloaded');	

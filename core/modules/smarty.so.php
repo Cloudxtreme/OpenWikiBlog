@@ -1,7 +1,8 @@
 <?php
 ### Smarty implementation FOR tuxKernel by WebNuLL
 ### Licensed under AGPLv3 ( Affero GPLv3 )
-# libmenu, no dependencies yet :-)
+### http://wiki.github.com/webnull/OpenWikiBlog/
+
 $EXT_INF = array ( 'classname' => 'libsmarty' );
 
 class libsmarty extends KernelModule
@@ -21,7 +22,7 @@ class libsmarty extends KernelModule
 
 		$this->Debug = &$Kernel->error_handler;
 		
-		$this -> FixParams ();
+		$this -> FixParams ( &$Params );
 
 
 		require ( 'core/lib/smarty/Smarty.class.php' );

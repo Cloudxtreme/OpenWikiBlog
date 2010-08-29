@@ -1,7 +1,7 @@
 <?php
-### HARDENED PATCH FOR tuxKernel by WebNuLL
+### Simple admin autorization module FOR tuxKernel by WebNuLL
 ### Licensed under AGPLv3 ( Affero GPLv3 )
-# http://wiki.github.com/webnull/OpenWikiBlog/libadmin-documentation
+# http://wiki.github.com/webnull/OpenWikiBlog/
 
 $EXT_INF = array ( 'classname' => 'libadmin');
 
@@ -27,6 +27,9 @@ class libadmin extends KernelModule
 			//# If the admin adress IP is same as login IP
 			if ( $_SESSION [ $this->Site] ['libadmin'] ['ip'] == $_SERVER['REMOTE_ADDR'] )
 			{
+				// define two hooks
+				#$this->Kernel->hooks->define_hook ( $this, 'modifyMenu', 'menu_translation' );
+				#$this->Kernel->hooks->define_hook ( $this, 'modifyMenu', 'menu_file' );
 				return true;
 			} else {
 				//# What now... we will crash the session here because of invalid ip adress
@@ -78,6 +81,17 @@ class libadmin extends KernelModule
 			unset ( $_SESSION[$this->Site]['libadmin'] );		
 
 			return true;
+		}
+	}
+
+	
+	public function modifyMenu ( $Input )
+	{
+		if ( is_string ( $Input ) )
+		{
+			return 'admin_menu';
+		} elseif (is_array($Input)) {
+			return unserialize(file_get_contents('websites/' .$this->Site. '/modules/libpage/admin_menu.php'));
 		}
 	}
 }

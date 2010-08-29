@@ -1,5 +1,6 @@
 <?php
 session_start ();
+
 #### Open Wiki Blog copyright by WebNuLL ( JID: webnull@ubuntu.pl )
 #### This code is on GPLv3 license
 #### Linux/Unix and Open Source/Free Software forever ;-)
@@ -10,7 +11,6 @@ include ( 'core/kernel.so.php');
 include ( 'websites/' .$SITE. '/core/config.php' );
 
 # DB and CFG variables will not be duplicated, there is a reference at class function
-
 $Kernel = new tuxKernel ( $CFG, $MODS, $HTML, $DEFMODS );
 $SQL = new tuxMyDB ( $DB, $CFG, $Kernel );
 
