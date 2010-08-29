@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Czas wygenerowania: 29 Sie 2010, 21:44
+-- Czas wygenerowania: 29 Sie 2010, 21:51
 -- Wersja serwera: 5.1.50
 -- Wersja PHP: 5.3.3
 
@@ -18,6 +18,27 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 -- Baza danych: `wikiblog`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `prefix_admin`
+--
+
+CREATE TABLE IF NOT EXISTS `prefix_admin` (
+  `id` int(2) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `passwd` varchar(180) NOT NULL,
+  `privigle` int(2) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Zrzut danych tabeli `prefix_admin`
+--
+
+INSERT INTO `prefix_admin` (`id`, `name`, `passwd`, `privigle`) VALUES
+(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 10);
 
 -- --------------------------------------------------------
 
