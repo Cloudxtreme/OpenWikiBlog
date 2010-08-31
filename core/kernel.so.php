@@ -187,8 +187,7 @@ class tuxKernel
 			return false;
 		}
 
-		$method=$Params[1]; // method name
-		$this->Mods[$Params[0]]->$method($Params[2]); // index no. 0 is class name, and no. 2 is arguments in array
+		$this->Mods[$Params[0]]->$Params[1]($Params[2]); // index no. 0 is class name, and no. 2 is arguments in array
 		
 	}
 

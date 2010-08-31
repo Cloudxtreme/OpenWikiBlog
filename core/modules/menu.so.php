@@ -40,7 +40,6 @@ class libmenu extends KernelModule
 
 			//# ===== GET THE MENU FROM TRANSLATION
 			$this->alang->loadTranslation($TranslationName);
-			echo "Using translation: $TranslationName";
 			$MenuList = $this->alang->$TranslationName;	
 		}
 		

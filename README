@@ -4,6 +4,16 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+01.09.2010 (third commit):
+	tuxKernel:
+	* Optimalization, removed clonned variable
+
+	libmenu:
+	- Removed "echo" debugging informations
+
+	libhooks:
+	* Optimalization, removed some clonned variables
+
 01.09.2010 (second commit):
 	tuxKernel:
 	+ ReturnSelfDumped() is now erasing SQL and CFG private variables to avoid posting passwords in to logs

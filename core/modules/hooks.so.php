@@ -37,10 +37,7 @@ class libhooks extends KernelModule
 			# moved to define_hook
 			#if (method_exists($this->hooks[$Name]['object'], $this->hooks[$Name]['method']))
 			#{
-				// ==== COMPLICATED? I THINK YES
-				$method = $Value['method'];
-				$module = $Value['object'];
-				$Array = $this->Kernel->$module->$method($Array);
+				$Array = $this->Kernel->$Value['object']->$Value['method']($Array);
 
 				// ==== FREE ARRAY FROM MEMORY
 				unset ($this->hooks[$Name]['bindings'][$Key]);
