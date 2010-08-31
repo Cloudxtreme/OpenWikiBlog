@@ -19,7 +19,7 @@ class libhooks extends KernelModule
 		#$this->alang = &$Kerne->alang;
 	}
 
-	public function start_hook ($Name, &$Array)
+	public function startHook ($Name, &$Array)
 	{
 		//if (!is_array($Array))
 		//{
@@ -51,14 +51,14 @@ class libhooks extends KernelModule
 		
 	}
 
-	public function define_hook ( $Module, $Method, $Hookname )
+	public function defineHook ( $Module, $Method, $Hookname )
 	{
 		if (method_exists($this->Kernel->$Module, $Method))
 		{
 			// if its first binded function
-			if ( !$this->hook_exists ( $Hookname ) )
+			if ( !$this->hookExists ( $Hookname ) )
 			{
-				$this->create_hook ( $Hookname );
+				$this->createHook ( $Hookname );
 			}
 
 			// add binded function
@@ -70,7 +70,7 @@ class libhooks extends KernelModule
 		}
 	}
 
-	public function hook_exists ( $Hook )
+	public function hookExists ( $Hook )
 	{
 		if ( !isset ( $this->hooks[$Hook]))
 			return false;
@@ -78,7 +78,7 @@ class libhooks extends KernelModule
 		return true;
 	}
 
-	private function create_hook ( $Hook )
+	private function createHook ( $Hook )
 	{
 		$this->hook[$Hook] = array('bindings', 'variable');
 	}

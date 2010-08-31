@@ -100,11 +100,7 @@ class libexceptions extends KernelModule
 					'session' => $_SESSION,
 					'error' => $RID ) );
 
-		$fp = @fopen ( 'data/crash/' .$LOG_ID. '.txt', 'w' );
-		@fwrite ( $fp, $Report );
-		@fclose ( $fp );
-		
-
+		file_put_contents('data/crash/' .$LOG_ID. '.txt', $Report);
 	}
 }
 ?>

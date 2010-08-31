@@ -278,7 +278,7 @@ class tuxMyDB_WhereClause
 		if ( !in_array ( $Equals, $Equals_list ) ) //# Needle, haystack...
 			return false;
 
-		$Statement_list = array ( 'OR', 'AND', '' );
+		$Statement_list = array ( 'OR', 'AND', '', ',' );
 	
 		if ( !in_array ( $Statement, $Statement_list ) ) //# Needle, haystack...
 			return false;

@@ -15,6 +15,10 @@ class tuxKernel
 	// ===== BUG FIXED ( PATCH: $this->$Apps to $this->Apps ), THANKS TO MICHAL SRODEK ( www.srodek.info )
 	public function ReturnSelfDumped()
 	{
+		// make sure there are all passwords erased
+		unset ( $this->CFG );
+		unset ( $this->SQL );
+
 		return array ( 'private:apps' => $this->Apps, 'protected:Version' => $this->Version, 'private:Mods' => $this->Mods);
 	}
 

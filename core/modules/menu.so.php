@@ -21,7 +21,7 @@ class libmenu extends KernelModule
 		$TranslationName = 'menu';
 
 		// if another plugin wants to change the menu, this is the option
-		$Kernel -> hooks -> start_hook ( 'menu_translation', $TranslationName );
+		$Kernel -> hooks -> startHook ( 'menu_translation', $TranslationName );
 
 		//# ==== IF TRANSLATION MODULE IS NOT LOADED, WE WILL TRY TO USE DEFAULT MENU FROM SERIALIZED ARRAY IN FILE
 		if ( !is_object ( $Kernel->alang ) )
@@ -31,7 +31,7 @@ class libmenu extends KernelModule
 				$MenuList = unserialize(file_get_contents ( 'websites/' .$this->Site. '/modules/libmenu/user-menu.php' ));
 
 				// binding to change menu by other plugins
-				$Kernel -> hooks -> start_hook ( 'menu_array', $MenuList );
+				$Kernel -> hooks -> startHook ( 'menu_array', $MenuList );
 			} else {
 				$MenuList = array ( 0 => array ( 'title' => 'No Menu file found', 'link' => '#' ) );
 				$this->Debug->logString ( 'menu.so.php::E_ERROR::init: No Menu file found in \'websites/' .$this->Site. '/modules/libmenu/menu.conf.php\'');

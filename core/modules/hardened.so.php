@@ -72,7 +72,7 @@ class KernelHardenedPatch extends KernelModule
 			// check for SQL injection
 			// there is no possibility to secure UPDATE, SELECT and others without making script slowly
 
-			if ( $this->stristr_array ( $Disallowed, $String  ) )
+			if ( $this->stristrArray ( $Disallowed, $String  ) )
 			{
 				$String = NuLL;
 			}	
@@ -81,8 +81,8 @@ class KernelHardenedPatch extends KernelModule
 		return $String;
 	}
 
-	// this function was copied from public code snipped, dont remember source but its very simple code :)
-	private function stristr_array( $haystack, $needle ) 
+	// this function was copied from public code snipped, don't remember source but its very simple code :)
+	private function stristrArray( $haystack, $needle ) 
 	{
 		if ( !is_array( $haystack ) ) {
 			return false;
