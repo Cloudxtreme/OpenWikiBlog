@@ -2,9 +2,9 @@
 class tuxKernel
 {
 	private $Mods=array();
-	public $SQL; # WE WILL KEEP DATABASE OBJECT HERE...
+	public $SQL; // WE WILL KEEP DATABASE OBJECT HERE...
 	private $CFG;
-	protected $Version='tuxKernel 0.24';
+	protected $Version='tuxKernel 0.25';
 	private $Apps;
 
 	public function __construct ( &$CFG, &$MODS, &$HTML, &$DEFMODS )
@@ -12,9 +12,10 @@ class tuxKernel
 		$this -> CFG = array ( 'CFG' => $CFG, 'MODS' => $MODS, 'HTML' => $HTML, 'DEFMODS' => $DEFMODS );
 	}
 
+	// ===== BUG FIXED ( PATCH: $this->$Apps to $this->Apps ), THANKS TO MICHAL SRODEK ( www.srodek.info )
 	public function ReturnSelfDumped()
 	{
-		return array ( 'private:apps' => $this->$Apps, 'protected:Version' => $this->Version, 'private:Mods' => $this->Mods);
+		return array ( 'private:apps' => $this->Apps, 'protected:Version' => $this->Version, 'private:Mods' => $this->Mods);
 	}
 
 	//# KEEP THIS FUNCTION SMALL AND FASTER, BECAUSE ITS CALLED ALL TIMES USING KERNEL
@@ -41,10 +42,10 @@ class tuxKernel
 			# return aceess to module
 			return $this->Mods[$Mod];
 
-		} elseif (isset($CFG[$tryCFG])) 
+		} elseif (isset($CFG[$Mod])) 
 		{
 			# will return configuration
-			return $CFG[$tryCFG];
+			return $CFG[$Mod];
 
 		} elseif (isset($this->Apps[$Mod])){
 					
@@ -98,7 +99,7 @@ class tuxKernel
 		// ==== CALLING SUPPORT THROUGH KERNEL MODPROBE FUNCTION
 		if (is_int($Module))
 		{
-			return $this->CallThroughtKernel(&$Params);
+			return $this->CallThroughtKernel($Params);
 		}
 
 		// external function will decide if we are continuing to load the module
@@ -141,18 +142,18 @@ class tuxKernel
 			return false;
 		}
 
-		//# ==== DEPENDENCY SUPPORT IS CANCELED, THERE IS ANOTHER *FASTER* WAY TO RESOLVE DEPENDENCIES AND LOAD IT WHEN THEY ARE NEEDED
-		# IF THE MODULE NEED ANY OTHER MODULE?
-		#if ( isset ( $EXT_INF['depends'] ) AND is_array ( $EXT_INF['depends'] ) )
-		#{
-			#if ( $this -> loadDeps ( $EXT_INF['depends'] ) == false )
-			#{
-			#	throw new Exception ('tuxKernel::E_ERROR::modprobe:: *Warning*: Failed resolving dependencies for module "' .$Module. '"', 7 );
-			#	return false;
-			#}
-		#}
+		// ==== DEPENDENCY SUPPORT IS CANCELED, THERE IS ANOTHER *FASTER* WAY TO RESOLVE DEPENDENCIES AND LOAD THEM WHEN THEY ARE NEEDED
+		// ==== IF THE MODULE NEED ANY OTHER MODULE?
+		/*if ( isset ( $EXT_INF['depends'] ) AND is_array ( $EXT_INF['depends'] ) )
+		{
+			if ( $this -> loadDeps ( $EXT_INF['depends'] ) == false )
+			{
+				throw new Exception ('tuxKernel::E_ERROR::modprobe:: *Warning*: Failed resolving dependencies for module "' .$Module. '"', 7 );
+				return false;
+			}
+		}*/
 
-		# LOAD THE WHOLE MODULE, YES WE FINISH CHECKING IT HERE!
+		// ==== LOAD THE WHOLE MODULE, YES WE FINISH CHECKING IT HERE!
 		$this->Mods[$Module] = new $EXT_INF['classname']($Params, $this);
 
 		if ( $this->Mods[$Module] -> state != 'ready' )
@@ -167,10 +168,10 @@ class tuxKernel
 		}
 	}
 
-	private function CallThroughtKernel ($Params)
+	private function CallThroughtKernel (&$Params)
 	{
-		// speed up the kernel, this if is not needed - there is method_exists() to check if function is valid
-		// selected module is not loaded
+		// ===== speed up the kernel, this if is not needed - there is method_exists() to check if function is valid
+		// ===== selected module is not loaded
 		/*if (!$this->isLoaded($Params[1]))
 		{
 			return false;

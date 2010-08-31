@@ -14,11 +14,6 @@ class tuxMyDB
 	}
 
 	public function query ( $Query )
-	{		
-		return new tuxMyDB_Object ( $Query );
-	}
-
-	public function dquery ( $Query )
 	{
 		$SQL = $this -> Socket -> query ( $Query );
 		
@@ -59,7 +54,7 @@ class tuxMyDB
 			$SQL .= ' LIMIT ' .intval($LimitFrom). ',' .intval($LimitTo);
 		}
 
-		return new tuxMyDB_Object ( $SQL, $this );
+		return new tuxMyDB_Object ( $this->query($SQL) );
 	
 	}
 
@@ -98,7 +93,7 @@ class tuxMyDB
 			$SQL .= ' LIMIT ' .intval($LimitFrom). ',' .intval($LimitTo);
 		}
 
-		return new tuxMyDB_Object ( $SQL, $this );
+		return new tuxMyDB_Object ( $this->query($SQL) );
 	}
 
 	//# DELETE FROM `users` WHERE `id`="1"
@@ -134,26 +129,25 @@ class tuxMyDB
 			$SQL .= ' LIMIT ' .intval($LimitFrom). ',' .intval($LimitTo);
 		}
 
-		echo "\n\nTHIS IS SQL: ".$SQL."\n\n";
-		#return new tuxMyDB_Object ( $SQL, $this );
+		return new tuxMyDB_Object ( $this->query($SQL) );
 	}
 
 	//# TRUNCATE TABLE `table`
 	public function TruncateTable ( $Table )
 	{
-		return new tuxMyDB_Object ( 'TRUNCATE TABLE `' .mysql_escape_string($Table). '`', $this );
+		return new tuxMyDB_Object ( $this->query('TRUNCATE TABLE `' .mysql_escape_string($Table). '`'));
 	}
 
 	//# DROP TABLE `table`
 	public function DropTable ( $Table )
 	{
-		return new tuxMyDB_Object ( 'DROP TABLE `' .mysql_escape_string($Table). '`', $this );
+		return new tuxMyDB_Object ( $this->query('DROP TABLE `' .mysql_escape_string($Table). '`'));
 	}
 
 	//# DROP TABLE `table`
 	public function DropDatabase ( $Database )
 	{
-		return new tuxMyDB_Object ( 'DROP DATABASE `' .mysql_escape_string($Database). '`', $this );
+		return new tuxMyDB_Object ( $this->query('DROP DATABASE `' .mysql_escape_string($Database). '`'));
 	}
 
 	//# DUMMY FUNCTION, IF YOU WANT TO IMPLEMENT IT JUST DO IT...
@@ -249,11 +243,9 @@ class tuxMyDB_Object
 {
 	private $Resource;
 
-	public function __construct ( $SQL, &$Caller )
+	public function __construct ( $SQL  )
 	{
-		#echo "SQL: $SQL\n"; 
-		$this -> Resource = $Caller->dquery($SQL);
-		#var_dump ( $Caller -> error());
+		$this -> Resource = $SQL;
 	}
 
 	public function __get ( $Variable )
@@ -272,9 +264,7 @@ class tuxMyDB_Object
 				return $this->Resource->fetch_array();
 			break;
 
-			case 'error':
-				return $this->Resource->error;
-			break;
+			// removed "error" because its no longer supported
 		}
 	}
 }
@@ -306,7 +296,7 @@ class tuxMyDB_WhereClause
 		} else
 			$Value = '"' .mysql_escape_string($Value). '"';
 
-		//          AND              id           ==            1
+		//          AND                     id           ==            1
 		$this->SQL .= $Statement. ' `' .$Column. '`' .$Equals. '' .$Value. ' ';
 
 		return true;

@@ -4,6 +4,15 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+01.09.2010:
+	MySQL driver:
+	- Removed dquery() function
+	* Enabled Delete() function
+
+	tuxKernel:
+	* Fixed access to CFG variables
+	* Fixed ReturnSelfDumped() (thanks to Michał Środek)
+
 30.08.2010:
 	libmenu:
 	+ Added support for hooking menu translations and menu list from array ( without translation )
