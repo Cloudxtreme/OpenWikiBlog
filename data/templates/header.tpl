@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Assault Cube - TuxPlace @ Gentoo Linux</title>
+
+		<!-- styles, icons -->
+		<link rel="icon" type="image/jpg" href="data/images/tux-icon.jpg"/>
+		<link href="data/style.css" rel="stylesheet" type="text/css" /> 
+
+		<!-- all important informations -->
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+
+		
+	
+	</head>
+
+	<body>
+
+		<div class="logo"> 
+			<div class="language_bar"><a href="?page=1&amp;trlang=english"><img src="data/images/flags/english.png" class="icon"></a> <a href="?page=1&amp;trlang=polski"><img src="data/images/flags/polski.png" class="icon"></a> &nbsp;</div>
+		</div>
+		<div id="menu"> 
+			<ul>
+				{foreach from=$menu key=mitemkey item=mitem}
+				<li><a href="{$mitem.link}">{$mitem.title}</a></li>
+				{/foreach}
+			</ul>
+
+		</div>
+
+		<div class="content" style="{$container_style}">
+			

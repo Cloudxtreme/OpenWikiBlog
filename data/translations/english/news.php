@@ -1,0 +1,7 @@
+<?php
+$Lang = array ('text_header' => "AssaultCube is a free multiplayer first-person shooter game, based on the CUBE engine. \n",
+		'text' => 'It takes place in realistic environments, with fast, arcade gameplay. Although the main focus of AssaultCube is multiplayer online gaming, a single player mode consists of computer-controlled bots.
+AssaultCube utilises efficient bandwidth usage, which means low-latency, so it can even run over a 56Kbps connection. As well as this, it can run on older computer hardware.',
+		'tuxplace_header' => 'TuxPlace network',
+		'tuxplace_text' => 'Our servers are created primarily for Linux, Solaris, *BSD, MacOSX users but we also welcome windows users.<br/><br/>Our network has multiple game servers - including free and Open Source software game Assault Cube.<br/>We aren\'t running servers for payable games - so all people can play on our servers without paying for game.<br/><br/>We are trying to use only cross-platform games - we think that operating system shall not be obstacle to play on our servers, but sometimes we are making an exception when game is running <b>perfectly</b> under <a href="http://winehq.org" rel="nofollow"><b>Wine</b></a>.<br/>');
+?>

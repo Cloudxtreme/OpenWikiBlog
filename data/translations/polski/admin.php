@@ -1,0 +1,3 @@
+<?php
+$Lang = array ('login_text' => 'Identyfikator użytkownika', 'password_text' => 'Hasło', 'restricted_area' => 'Dostęp do tej części strony wymaga zalogowania', 'login_submit' => 'Zaloguj', 'LIBADMIN_BANNED' => 'Twoje konto zostało zablokowane, skontaktuj się z głównym administratorem.', 'LIBADMIN_IP_ACCESS_DENIED' => 'Dostęp do tego konta jest ograniczony jedynie do określonego adresu IP, Twój adres nie został dopuszczony.');
+?>

@@ -16,12 +16,9 @@ class libmypage extends KernelModule
 		$this -> Kernel = $Kernel;
 		$this->state = 'ready';
 		$this->Debug = &$Kernel->error_handler;
-		$this->DB = &$Kernel->SQL;
-		$this->tpl = &$Kernel->tpl;
-		$this->alang = &$Kernel->alang;
-
-		// dont forget about security, be paranoic!
-		$SITE = addslashes($_GET['SITE']);
+		$this->DB = $Kernel->SQL;
+		$this->tpl = $Kernel->tpl;
+		$this->alang = $Kernel->alang;
 
 		// if page is unset, set default one
 		if ( !isset ( $_GET['page'] ) )
@@ -32,7 +29,7 @@ class libmypage extends KernelModule
 		#### SQL QUERY
 		$WhereClause = new tuxMyDB_WhereClause ();
 		$WhereClause -> Add ('', 'id', '=', intval($_GET['page']) );
-		$WhereClause -> Add ('AND', 'site', '=', $SITE );
+		#$WhereClause -> Add ('AND', 'site', '=', $SITE ); # Multi-site feature cancelled
 		
 		# TEMPLATE: Select ( $What, $From, $Where='', $OrderBy='', $POS='ASC', $LimitFrom='', $LimitTo='' )
 		$Q = $this->DB->Select( '*', 'libmypage', $WhereClause, '', '', 0,1);
@@ -44,7 +41,7 @@ class libmypage extends KernelModule
 		{
 			$Page = $Q -> fetch_assoc;
 			
-			$INC_FILE = $this -> checkForPage ( &$Page, $SITE );
+			$INC_FILE = 'data/pages/' .$Page['include']. '.php';
 			$TPL_FILE = $Page['template'];
 
 			// PREPARE ENVIRONMENT
@@ -60,7 +57,7 @@ class libmypage extends KernelModule
 			# "ITS NOT A BUG - ITS FEATURE" haha ;-)
 			$Page = array ( 'include' => '404' );
 
-			$INC_FILE = $this -> checkForPage ( $Page, $SITE );
+			$INC_FILE = 'data/pages/404.php';
 			$TPL_FILE = '404.tpl';
 
 			// PREPARE ENVIRONMENT
@@ -74,20 +71,6 @@ class libmypage extends KernelModule
 
 		//$this -> tpl -> display ( $TPL_FILE );
 		$this->tplfile=$TPL_FILE;
-	}
-
-	public function checkForPage ( &$Page, $SITE )
-	{
-		$INC_FILE=false;
-
-		if ( is_file ( 'websites/' .$SITE. '/pages/' .$Page['include']. '.php' ) )
-		{
-			$INC_FILE='websites/' .$SITE. '/pages/' .$Page['include']. '.php';
-		} elseif ( is_file ( 'pages/' .$Page['include']. '.php' ) ) {
-			$INC_FILE='pages/' .$Page['include']. '.php';			
-		}
-
-		return $INC_FILE;
 	}
 
 	public function display ()

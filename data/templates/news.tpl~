@@ -1,0 +1,17 @@
+{include file="header.tpl" title=Header}
+<div class="text_container">
+				<h2>{$tuxplace_header}</h2>
+				<br/>
+				<br/>
+				{$tuxplace_text}
+				<br/><br/>
+				<b>{$text_header}</b>
+				<br/>
+				<br/>
+					<div class="centered">
+						<img src="data/images/screenshots/thumbnails/ac1.jpg" class="thumbnail"> <img src="data/images/screenshots/thumbnails/ac2.jpg" class="thumbnail"> <img src="data/images/screenshots/thumbnails/ac3.jpg" class="thumbnail"> <img src="websites/cube/images/screenshots/thumbnails/ac4.jpg" class="thumbnail">
+					</div>
+				<br/>
+				{$text}
+			</div>
+{include file="footer.tpl" title=footer}

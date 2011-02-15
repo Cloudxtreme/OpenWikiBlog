@@ -80,7 +80,7 @@ class libexceptions extends KernelModule
 			$Log .= "\n<br/><b>" .$Value['file']. "(" .$Value['line']. "): " .$Value['message']. "</b><br/>\nStack trace: ".$Value['trace']."<br/><br/>\n\n";
 		}
 
-		echo str_replace('{error}', $Log, $Config['HTML']['header']);
+		echo str_replace('{error}', $Log, $Config['html']['header']);
 
 		$this -> MakeADump ( $Log );
 

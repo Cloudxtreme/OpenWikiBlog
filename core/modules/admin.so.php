@@ -17,7 +17,7 @@ class libadmin extends KernelModule
 		$this->state = 'ready';
 		$this->Params = $Params;
 		$this->DB = &$Kernel->SQL;
-		$this->Site = $_GET['SITE'];
+		//$this->Site = $_GET['SITE'];
 	}
 
 	public function shva ( ) //# From google "shva" - should have valid autorization ;-)
@@ -121,7 +121,7 @@ class libadmin extends KernelModule
 		{
 			return 'admin_menu';
 		} elseif (is_array($Input)) {
-			return unserialize(file_get_contents('websites/' .$this->Site. '/modules/libpage/admin_menu.php'));
+			return unserialize(file_get_contents('data/modules/libpage/admin_menu.php'));
 		}
 	}
 }

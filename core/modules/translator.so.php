@@ -9,7 +9,7 @@ class libtranslate extends KernelModule
 {
 	# this is a plugin current state, kernel must check if the module is ready to use
 	public $state='module not ready';
-	private $Site, $arTranslations, $Language='english', $Params, $Debug;
+	private $arTranslations, $Language='english', $Params, $Debug;
 
 	public function __construct ( $Params, &$Kernel )
 	{
@@ -22,9 +22,6 @@ class libtranslate extends KernelModule
 
 		// bind debugger
 		$this->Debug = &$Kernel->error_handler;
-
-		// bind as local variable
-		$this -> Site = addslashes($_GET['SITE']);
 
 		// HERE IS LANGUAGE "SWITCH", JUST TYPE INDEX.PHP?trlang=english to set english as default language in current session
 		if ( isset ( $_GET['trlang'] ) )
@@ -65,7 +62,7 @@ class libtranslate extends KernelModule
 		// security, never trust user... or third party module developer ;-)
 		$Lang = addslashes($Lang);
 
-		if (!is_dir('websites/' .$this->Site. '/translations/' .$Lang. '/'))
+		if (!is_dir('data/translations/' .$Lang. '/'))
 		{
 			$this->Debug->logString ('translator.so.php::E_ERROR::setLanguage: No language directory found for "' .$Lang. '"');
 			throw new Exception ( 'translator.so.php::E_ERROR::setLanguage:: No language directory found for "' .$Lang. '"', 81 );
@@ -73,7 +70,7 @@ class libtranslate extends KernelModule
 		}
 
 		// we must save some debugging informations - its more easy to fix error when there are debugging informations ;-)
-		$this->Debug->logString ('translator.so.php::E_INFO::setLanguage: Language "websites/' .$this->Site. '/translations/' .$Lang. '/" loaded.');
+		$this->Debug->logString ('translator.so.php::E_INFO::setLanguage: Language "data/translations/' .$Lang. '/" loaded.');
 		// save language to session to recover at next page load
 		$_SESSION[$this->Site]['language'] = $Lang;
 
@@ -88,7 +85,7 @@ class libtranslate extends KernelModule
 		// security... never, never trust user or third party module developer ;-)
 		$File = addslashes ( $File );
 
-		if (!is_file( 'websites/' .$this->Site. '/translations/' .$this->Language. '/' .$File. '.php'))
+		if (!is_file( 'data/translations/' .$this->Language. '/' .$File. '.php'))
 		{
 			$this->Debug->logString ( 'translator.so.php::E_ERROR::loadTranslation: Cannot load translation file "' .$File. '"');
 			return false;
@@ -97,7 +94,7 @@ class libtranslate extends KernelModule
 		// lang will be loaded from file..
 		$Lang = false;
 
-		include ( 'websites/' .$this->Site. '/translations/' .$this->Language. '/' .$File. '.php' );
+		include ( 'data/translations/' .$this->Language. '/' .$File. '.php' );
 		$this -> arTranslations [ $File ] = $Lang;
 		return true;
 	}
@@ -124,7 +121,7 @@ class libtranslate extends KernelModule
 
 	public function languageExists ( $Lang )
 	{
-		if ( is_dir('websites/' .$this->Site. '/translations/' .$Lang. '/'))
+		if ( is_dir('data/translations/' .$Lang. '/'))
 		{
 			return true;
 		} else {

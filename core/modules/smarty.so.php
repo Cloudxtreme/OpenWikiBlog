@@ -25,7 +25,7 @@ class libsmarty extends KernelModule
 		$this -> FixParams ( &$Params );
 
 
-		require ( 'core/lib/smarty/Smarty.class.php' );
+		require ( $this->Kernel->LD_LIBRARY_PATH. 'core/lib/smarty/Smarty.class.php' );
 
 		// new smarty object
 		$this->tpl = new Smarty;

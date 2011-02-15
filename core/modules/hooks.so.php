@@ -15,7 +15,6 @@ class libhooks extends KernelModule
 	{
 		$this -> Kernel = $Kernel;
 		$this->state = 'ready';
-		$this->Site = addslashes($_GET['site']);
 		#$this->alang = &$Kerne->alang;
 	}
 

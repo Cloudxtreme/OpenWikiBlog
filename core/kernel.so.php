@@ -2,14 +2,18 @@
 class tuxKernel
 {
 	private $Mods=array();
-	public $SQL; // WE WILL KEEP DATABASE OBJECT HERE...
+	//public $SQL; // WE WILL KEEP DATABASE OBJECT HERE...
 	private $CFG;
-	protected $Version='tuxKernel 0.25';
+	protected $Version='tuxKernel 0.27';
 	private $Apps;
+	
+	// ===== Where are framework core files?
+	public $LD_LIBRARY_PATH='';
 
-	public function __construct ( &$CFG, &$MODS, &$HTML, &$DEFMODS )
+	public function __construct ( &$CFG )
 	{
-		$this -> CFG = array ( 'CFG' => $CFG, 'MODS' => $MODS, 'HTML' => $HTML, 'DEFMODS' => $DEFMODS );
+		//$this -> CFG = array ( 'CFG' => $CFG, 'MODS' => $MODS, 'HTML' => $HTML, 'DEFMODS' => $DEFMODS );
+		$this -> CFG = $CFG;
 	}
 
 	// ===== BUG FIXED ( PATCH: $this->$Apps to $this->Apps ), THANKS TO MICHAL SRODEK ( www.srodek.info )
@@ -17,7 +21,6 @@ class tuxKernel
 	{
 		// make sure there are all passwords erased
 		unset ( $this->CFG );
-		unset ( $this->SQL );
 
 		return array ( 'private:apps' => $this->Apps, 'protected:Version' => $this->Version, 'private:Mods' => $this->Mods);
 	}
@@ -30,13 +33,13 @@ class tuxKernel
 		// ==== DEFAULT MODULE ON DEMAND
 		if (!isset($this->Apps[$Mod]))
 		{
-			if (isset($this->CFG['DEFMODS'][$Mod]))
-				$this->modprobe($this->CFG['DEFMODS'][$Mod], '');
+			if (isset($this->CFG['defmods'][$Mod]))
+				$this->modprobe($this->CFG['defmods'][$Mod], '');
 		}
 
 		// ==== THIS IS SOLUTION FOR DEPENDENCIES, SO THE DEPENDENCIES OPTION WAS REMOVED
 		// ==== MODULE ON DEMAND FUNCTION
-		if (is_file('core/modules/' .$Mod. '.so.php') AND !isset($this->Mods[$Mod]))
+		if (is_file($this->LD_LIBRARY_PATH. 'core/modules/' .$Mod. '.so.php') AND !isset($this->Mods[$Mod]))
 		{
 			$this->modprobe($Mod, '');
 		}
@@ -46,10 +49,10 @@ class tuxKernel
 			# return aceess to module
 			return $this->Mods[$Mod];
 
-		} elseif (isset($CFG[$Mod])) 
+		} elseif (isset($CFG['mods'][$Mod])) 
 		{
 			# will return configuration
-			return $CFG[$Mod];
+			return $CFG['mods'][$Mod];
 
 		} elseif (isset($this->Apps[$Mod])){
 					
@@ -70,7 +73,7 @@ class tuxKernel
 	{
 		// ==== On k_TRIGGERS we will operate
 		// ==== Our array looks like Params [ param1, param2, k_TRIGGERS[1 = [ 1='1' 2='1' ]] ]
-		if (is_array($Params['k_TRIGGERS']))
+		if (is_array(@$Params['k_TRIGGERS']))
 		{
 			// init variable to avoid errors, its a good thing like in c, c++ and other fast languages
 			$True=0;
@@ -100,10 +103,19 @@ class tuxKernel
 	# LOAD OUR MODULE
 	public function modprobe ( $Module, $Params='' )
 	{
+		//if ($Module == '')
+			//return 0;
+
 		// ==== CALLING SUPPORT THROUGH KERNEL MODPROBE FUNCTION
 		if (is_int($Module))
 		{
+			$this -> error_handler -> logString ( 'kernel.so.php::E_INFO::modprobe: Calling throught kernel x: ' .$Params[0]. ', y: ' .$Params[1]);
 			return $this->CallThroughtKernel($Params);
+		}
+
+		if ($Module==NuLL)
+		{
+			return false;
 		}
 
 		// external function will decide if we are continuing to load the module
@@ -114,24 +126,24 @@ class tuxKernel
 
 		if ( $this -> isLoaded ( $Module ) )
 		{
-			throw new Exception ( 'tuxKernel::E_NOTICE::modprobe:: *Notice*: Module "' .$Module. '" already loaded.', 4 );
+			//throw new Exception ( 'tuxKernel::E_NOTICE::modprobe:: *Notice*: Module "' .$Module. '" already loaded.', 4 );
 			// we will cancel it, because it can erase whole data, use rmmod and re-modprobe instead
 			return false;
 		}
 
 		/*
-		 * KERNEL OPTIMALIZATIONS
+		 * KERNEL OPTIMIZATIONS
 		 *
 		if ( !is_file ( 'core/modules/' .$Module. '.so.php' ) )
 		{
 			throw new Exception ( 'tuxKernel::E_ERROR::modprobe:: *Warning*: Module "' .$Module. '" not found.', 3 );
 			return false;	
 		}*/
-
-		@include ( 'core/modules/' .$Module. '.so.php' ); // faster solution is to add "@"
+		
+		@include ( $this->LD_LIBRARY_PATH. 'core/modules/' .$Module. '.so.php' ); // faster solution is to add "@"
 
 		/*
-		 * KERNEL OPTIMALIZATIONS
+		 * KERNEL OPTIMIZATIONS
 		 *
 		if ( !isset ( $EXT_INF ) )
 		{
@@ -140,7 +152,7 @@ class tuxKernel
 		} 
 		*/
 
-		if ( !class_exists ( $EXT_INF [ 'classname'] ) )
+		if ( !class_exists ( $EXT_INF['classname']))
 		{
 			throw new Exception ( 'tuxKernel::E_ERROR::modprobe:: *Warning*: Class "' .$EXT_INF['classname']. '" not found for module "' .$EXT_INF. '", aborting loading module.', 2 );
 			return false;
@@ -263,6 +275,16 @@ class tuxKernel
 	{
 		$this -> Apps [ $Usage ] = $Tool;
 		return true;
+	}
+
+	public function lsmod()
+	{
+		$Out = array();
+		foreach ($this->Mods as $Key => $Value)
+		{
+			$Out[] = $Key;
+		}
+		return $Out;
 	}
 }
 

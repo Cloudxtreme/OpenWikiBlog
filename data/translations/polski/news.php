@@ -1,0 +1,6 @@
+<?php
+$Lang = array ('text_header' => "AssaultCube - gra komputerowa typu FPS należąca do wolnego oprogramowania.\n",
+		'text' => 'Tworzona jest ochotniczo przez zespół Rabid Viper Productions, który wspomaga zgromadzona wokół projektu społeczność. Założeniem twórców było stworzenie lekkiej, wieloplatformowej i łatwo edytowalnej gry zajmującej niewiele pamięci - aby grać, wystarczy pobrać z internetu około 40MB danych. Do poprawnego działania wystarczy standardowy modem o maksymalnej przepustowości 56kb/s.',
+		'tuxplace_header' => 'Serwery TuxPlace',
+		'tuxplace_text' => 'Nasze serwery zostały stworzone z myślą głównie o użytkownikach systemów Linux, Solaris, *BSD, MacOSX jednak zapraszamy również do gry użytkowników windows.<br/><br/>Nasza sieć liczy wiele serwerów gier - w tym wolna i otwartoźródłowa gra Assault Cube.<br/>Nie stawiamy serwerów płatnych gier tak aby każdy użytkownik mógł na naszym serwerze zagrać.<br/><br/>Staramy się stawiać na wieloplatformowość - system operacyjny nie powinien stać na przeszkodzie dlatego w większości wybieramy natywne gry dostępne dla większości systemów operacyjnych, czasami robimy wyjątek stawiając serwer gry która działa <b>doskonale</b> przy użyciu <a href="http://winehq.org" rel="nofollow"><b>Wine</b></a>.<br/>');
+?>
