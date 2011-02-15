@@ -5,7 +5,7 @@ session_start ();
 #### This code is on GPLv3 license
 #### Linux/Unix and Open Source/Free Software forever ;-)
 
-$PATH="../framework/";
+$PATH="./";
 
 include($PATH. 'core/subpages.so.php');
 $Subpage = new Subpage($PATH);
