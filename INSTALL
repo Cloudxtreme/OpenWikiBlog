@@ -1,0 +1,36 @@
+#=============================================================
+#=== LICENSED UNDER AGPLv3
+#=== (C) WebNuLL ( babciastefa [ at ] gmail [ dot ] com )
+#=== http://github.com/webnull/OpenWikiBlog
+#=============================================================
+
+# DOWNLOAD
+
+- Link for people who downloading by internet browser:
+
+http://github.com/webnull/OpenWikiBlog/zipball/master
+
+- Commands to type in SSH (Terminal) to download OpenWikiBlog framework:
+
+wget http://github.com/webnull/OpenWikiBlog/zipball/master --no-check-certificate -O OpenWikiBlog.zip
+unzip OpenWikiBlog.zip
+rm OpenWikiBlog.zip
+
+# INSTALLATION
+
+- When you downloaded copy of OpenWikiBlog repository and extracted it now you have to set needed to work chmods (file privileges):
+
+777 - data/crash
+777 - data/db
+777 - data/templates_c
+
+You can do it by your FTP client or by typing these commands in Terminal:
+
+chmod -R 777 data/crash
+chmod -R 777 data/db
+chmod -R 777 data/templates_c
+
+- Now everything is working and ready to work.
+Congratulations.
+
+

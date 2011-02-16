@@ -1,4 +1,5 @@
 <?php
+
 # Set default time zone
 date_default_timezone_set ('Europe/Warsaw');
 
@@ -43,7 +44,7 @@ $CFG['mods']['smarty'] = array ( 'caching' => false,
 				'config_dir' => 'data/core', 
 				'cache_dir' => 'data/cache' ); # FOR LOADING TEMPLATE
 
-// ===== The translator will help you load diffirent language
+// ===== The translator will help you load different language
 $CFG['mods']['translator'] = array ( 'default_language' => 'english' );
 
 // ===== Mypage will show current subpage using Smarty and Translator
@@ -57,4 +58,7 @@ $CFG['mods']['menu'] = NuLL; # this will create our menu
 
 # ADDITIONAL HTML CODE WHEN ERROR WILL OCCURE
 $CFG['html']=array('header' => "<html><head><title>OPS!</title></head><body><h2>We are sorry! Our application crashed unexpectly and report was sent to administrator.</h2>\n<br/>{error}<br/>Dont worry, just try to go back in your web browser - we will repair this site soon.</body></html>");
+
 ?>
+
+
