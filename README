@@ -4,6 +4,111 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+20.03.2011:
+	tuxKernel:
+	+ Integrated cache system
+
+	MySQL Driver:
+	+ Implemented Insert() function
+	+ Implemented "LIKE" operator in tuxMyDB_WhereClause
+	* Fixed Delete() function
+	+ Added ConvertFields() function
+	+ Multi-socket feature - possibility to create sockets that changes only some things like just PREFIX or database or whole server
+	+ One Time Query prefix change
+
+	tuxSQLite:
+	+ One Time Query prefix change
+	+ Multi-socket feature - possibility to create sockets that changes only some things like just PREFIX or database
+
+	libarchive_rar:
+	- Incomplete unpacking functions (working hard on it)
+
+19.03.2011:
+	rconf:
+	+ Repository parser, editor
+	+ Support for flags (eg. "trusted")
+
+	libarchive_zip:
+	+ Extracting whole archive, selected directories or files
+
+11.03.2011:
+	libarchive_rar:
+	+ Implementation of Boxman universal interface to operate on RAR archives (read only due to patents restrictions)
+
+10.03.2011:
+	libarchive_zip:
+	+ manipulateBackslash() allows removing or adding backslashes to string on demand
+	+ readFile() return contents of compressed file or false
+
+07.03.2011:
+	tuxKernel:
+	* Fixed possible DOS in modprobe()
+	+ Custom modules naming by metadata
+	* Module ready checking deleted, module is now checked if created object exists in memory
+
+	libboxman:
+	+ This new library will allow to modify, create or delete archives and files inside them
+
+	libarchive_zip:
+	+ ls() allows navigating throught archive, returns easy to use data
+	+ createArchive() for creating new archives
+	+ checkResource() allows checking if ZIP archive is valid
+	+ addDirByRecursion() a private method creating new directories and adding files to archive
+	+ addEmptyDirsByRecursion() creates directories from string eg. root-directory/subdirectory1/subdirectory2
+	+ extract() - extracts all or selected files to specified directory
+	+ mv() renames files inside archive
+	+ rm() removes files from archive
+	+ addObject() add multiple files or directories (recursively) to archive
+	
+
+27.02.2011:
+	tuxSQLite:
+	+ convertFields now accepts numeric values for example "1" (int in string)
+	* Fixed INT handling in convertFields()
+	+ Update() now supports PREFIX
+	* Fixed convertWhere() error information
+	+ Extra Debugging informations
+
+	libmypage:
+	+ Added support for SEO links (pages by name, not by id)
+
+26.02.2011:
+	tuxSQLite:
+	* Fixed non-object call in tuxMyDB_Object::__get()
+	* Fixed Delete() function
+	+ Implemented "LIKE" operator in tuxMyDB_WhereClause
+
+	libtranslator:
+	* Optimized loadTranslation() function, now it checks if translation was already loaded
+
+17.02.2011:
+	subpage:
+	* Fixed error handling
+
+	libsmarty:
+	+ fillFromArray() will allow to assign multiple variables from array automatically, example fillFromArray(array('first'=>'tux', 'second'=>'bsd', 'third'=>'apple', 'fourth'=>'window'))
+
+	tuxSQLite:
+	* Fixed bug when fetch_assoc not returning values (requests for single rows "LIKE MYSQL")
+	+ Insert() function implemented
+
+	tuxKernel:
+	* Version variable is now public
+	+ File overlays ( $Kernel->findDir() will search for file in LD_LIBRARY_PATH.$File and $File and return result ), so there is now possibility to place module files in application directory
+
+16.02.2011:
+	navigation:
+	+ Its new module for use with subpages (libpage) because you need to be in class to use libhooks, this is a simple class where you can store variables for use with libhooks
+
+	libmenu:
+	+ Added hook to menu array for translated menus
+
+	libhooks:
+	+ Possible to define second argument when calling a hooked function, example thisFunctionWillModifyHookedVariable($OriginalVariable, $HereGoesSecondArgument)
+
+	libmypage:
+	+ Added Kernel bindings ($Kernel environment variable now points to Kernel)
+
 30.01.2011:
 	libmypage:
 	* Removed callings to "SITE" variable

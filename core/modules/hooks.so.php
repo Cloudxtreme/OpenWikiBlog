@@ -15,7 +15,7 @@ class libhooks extends KernelModule
 	{
 		$this -> Kernel = $Kernel;
 		$this->state = 'ready';
-		#$this->alang = &$Kerne->alang;
+		#$this->alang = &$Kernel->alang;
 	}
 
 	public function startHook ($Name, &$Array)
@@ -36,7 +36,10 @@ class libhooks extends KernelModule
 			# moved to define_hook
 			#if (method_exists($this->hooks[$Name]['object'], $this->hooks[$Name]['method']))
 			#{
-				$Array = $this->Kernel->$Value['object']->$Value['method']($Array);
+				if (is_null($Value['argument']))
+					$Array = $this->Kernel->$Value['object']->$Value['method']($Array);
+				else
+					$Array = $this->Kernel->$Value['object']->$Value['method']($Array, $Value['argument']);
 
 				// ==== FREE ARRAY FROM MEMORY
 				unset ($this->hooks[$Name]['bindings'][$Key]);
@@ -47,7 +50,7 @@ class libhooks extends KernelModule
 		
 	}
 
-	public function defineHook ( $Module, $Method, $Hookname )
+	public function defineHook ( $Module, $Method, $Hookname, $SecondArgument=NuLL )
 	{
 		if (method_exists($this->Kernel->$Module, $Method))
 		{
@@ -58,7 +61,7 @@ class libhooks extends KernelModule
 			}
 
 			// add binded function
-			$this->hooks[$Hookname]['bindings'][] = array ( 'object' => $Module, 'method' => $Method );
+			$this->hooks[$Hookname]['bindings'][] = array ( 'object' => $Module, 'method' => $Method, 'argument' => $SecondArgument );
 
 			return true;
 		} else {

@@ -3,24 +3,119 @@ $EXT_INF = array ( 'classname' => 'tuxMyDB');
 
 class tuxMyDB extends KernelModule
 {
-	private $Socket, $SID, $Version='tuxMyDB 0.25', $Kernel;
-	public $PREFIX, $SocketType='mysqli', $Type='mysql', $Debug;
+	private $Sockets, $CurrentSocket, $Version='tuxMyDB 0.25', $Kernel, $AltDB;
+	public $PREFIX, $SocketType='mysqli', $PREFIX_Cache, $Type='mysql', $Debug;
 
 	public function __construct ( &$Params, &$Kernel )
 	{
-		$this -> Socket = new mysqli ( $Params[0]['db']['host'], $Params[0]['db']['user'], $Params[0]['db']['passwd'], $Params[0]['db']['db'] );
-		$this -> SID = $Params[0]['site'][ 'site_id' ];
+		$this -> Sockets['default'] = new mysqli ( $Params[0]['db']['host'], $Params[0]['db']['user'], $Params[0]['db']['passwd'], $Params[0]['db']['db'] );
+		$this -> CurrentSocket = 'default';
+
 		$this -> PREFIX = $Params[0]['db']['prefix'];
+		$this -> Debug = @$Params[0]['db']['debug'];
 		$this -> Kernel = &$Kernel;
-		$this -> state = 'ready';
+
+		// alternative sockets
+		$this -> AltDB = $Params[0]['db']['alt'];
 
 		$Kernel -> setAsDefault ( 'mysqli', 'SQL' );
 	}
 
 	public function query ( $Query )
 	{
-		$SQL = $this -> Socket -> query ( $Query );
-		return $SQL;
+		if($this->Debug != false)
+			$this->Kernel->error_handler->logString( $this->Version. '::E_DEBUG::query: Executing ' .$Query);
+
+		$this->RestorePrefix();
+
+		return $this -> Sockets [ $this -> CurrentSocket ] -> query ( $Query );
+	}
+
+	public function SwitchPrefixForOneQuery($Prefix)
+	{
+		$this->PREFIX_Cache = $this->PREFIX;
+		$this->PREFIX = $Prefix;
+
+		return true;
+	}
+
+	public function RestorePrefix()
+	{
+		if($this->PREFIX_CACHE != false)
+		{
+			$this->PREFIX = $this->PREFIX_Cache;
+			$this->PREFIX_CACHE = false;
+		}
+	}
+
+	private function ConnectDB($DBName)
+	{
+		if(!isset($this->AltDB[$DBName]))
+			return false;
+
+		$a = false;
+
+		// if its a prefix change
+		if(isset($this->AltDB[$DBName]['prefix']))
+		{
+			$a = true;
+			$this->PREFIX = $this->AltDB[$DBName]['prefix'];
+		}
+
+		// creating new connection to database
+		if(isset($this->AltDB[$DBName]['host']))
+		{
+			$this -> Kernel -> error_handler -> logString ( $this->Version. '::E_INFO::ConnectDB: Connecting to ' .$DBName. ' database.');
+
+			// i think its important to add this debugging information
+			if (!is_file($DBName))
+			{
+				throw new Exception($this->Version. '::NO_DB::ConnectDB: Database "' .$DBName. '" does not exists');
+			}
+
+			// new connection
+			$this -> Sockets[$DBName] = new mysqli ( $this->AltDB[$DBName]['host'], $this->AltDB[$DBName]['db']['user'], $this->AltDB[$DBName]['passwd'], $this->AltDB[$DBName]['db'] );
+
+			// set connection as default
+			$this->CurrentSocket = $DBName;
+
+			return true;
+		}
+
+		// changing database
+		if(isset($this->AltDB[$DBName]['db']))
+		{
+			$this->DB->select_db($this->AltDB[$DBName]['db']);
+			return true;
+		}
+		
+
+		return $a;
+	}
+
+	// we are able to connect to many databases at one time and switch between them
+	public function SwitchDB ($DBName)
+	{
+		// if socket already exists we will just set it as default
+		if (isset($this->Sockets[$DBName]))
+		{
+			$this->CurrentSocket = $DBName;
+		} else {
+			// if socket does not exists, we will create it here
+			$this->ConnectDB($DBName);
+		}
+	}
+
+	public function __get ( $Variable )
+	{
+		switch ( $Variable )
+		{
+			case 'DB':
+				return $this->Sockets[$this->CurrentSocket];
+			break;
+
+			// removed "error" because its no longer supported
+		}
 	}
 
 	public function Select ( $What, $From, $Where='', $OrderBy='', $POS='', $LimitFrom='', $LimitTo='' )
@@ -99,31 +194,52 @@ class tuxMyDB extends KernelModule
 		return new tuxMyDB_Object ( $this->query($SQL) );
 	}
 
-	//# DELETE FROM `users` WHERE `id`="1"
-	public function Delete ($What='', $From, $Where='', $OrderBy='', $POS='', $LimitFrom='', $LimitTo='')
+	//# INSERT INTO `table` (`id`, `test`) VALUES (1, 'blahblah')
+	public function Insert ($What='', $Fields, $Values)
 	{
-		$What = $this->convertWhat ( $What );
+		$SQL = 'INSERT INTO `' .$this->PREFIX.mysql_escape_string($What). '` (' .$this->convertFields($Fields). ') VALUES (' .$this->convertFields($Values). ');';
 
-		$SQL = 'DELETE ' .$What. ' FROM `' .mysql_escape_string($From). '`';
+		return new tuxMyDB_Object ( $this->query($SQL) );
+	}
+
+	/* CONVERT ARRAY TO FIELDS/VALUES SYNTAX IN SQL LANGUAGE, example: input - array('id', 'name') or values input - array(1, 'Anna') */
+	public function convertFields ($Array)
+	{
+		$TotalFields = count($Array);
+		$Position = 0;
+		foreach ($Array as $Key => $Value)
+		{
+			$Position++;
+
+			if($Value == NuLL OR $Value == "NULL")
+				$SQL .= 'NULL';
+			elseif(is_numeric($Value))
+				$SQL .= $Value; 
+			elseif(is_int($Value))
+				$SQL .= $Value;
+			else
+				$SQL .= '"' .mysql_escape_string($Value). '"';
+
+			if($Position == $TotalFields)
+				continue;
+
+			$SQL .= ',';
+		}
+
+		return $SQL;
+	}
+
+	//# DELETE FROM `users` WHERE `id`="1"
+	public function Delete ($From, $Where='', $LimitFrom='', $LimitTo='')
+	{
+
+		$SQL = 'DELETE FROM `' .$this->PREFIX.mysql_escape_string($From). '`';
 
 		//# Where
 		if ( $Where != '' )
 		{
 			$Where = $this->convertWhere ( $Where );
 			$SQL .= ' WHERE ' .$Where;
-		}
-
-		//# OrderBy and POS
-		if ( $OrderBy != '' )
-		{
-			$OrderBy = $this->convertWhat($OrderBy);
-			$SQL .= ' ORDER BY ' .$OrderBy;
-
-			//# Pos ( ASC, DESC )
-			if ( $POS == 'DESC' )
-				$SQL .= ' DESC'; # DESCENDING 
-			else
-				$SQL .= ' ASC'; # ASCENDING ( DEFAULT )
 		}
 
 		//# Limit
@@ -277,9 +393,13 @@ class tuxMyDB_WhereClause
 	private $SQL=NuLL;
 	public function Add ( $Statement, $Column, $Equals, $Value )
 	{
-		$Equals_list = array ( '=' , '!=', '<', '>', '<=', '>=' );
+		$Equals_list = array ( '=' , '!=', '<', '>', '<=', '>=', 'LIKE' );
+
 		if ( !in_array ( $Equals, $Equals_list ) ) //# Needle, haystack...
 			return false;
+
+		if ($Equals == 'LIKE')
+			$Equals = ' LIKE '; // to be valid with syntax
 
 		$Statement_list = array ( 'OR', 'AND', '', ',' );
 	

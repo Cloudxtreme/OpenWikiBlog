@@ -3,8 +3,8 @@ $EXT_INF = array ( 'classname' => 'tuxSQLite');
 
 class tuxSQLite extends KernelModule
 {
-	private $Sockets, $SID, $Version='tuxSQLite 0.1', $Kernel, $CurrentSocket;
-	public $PREFIX, $SocketType='sqlite', $Type='objective-sqlite', $Debug;
+	private $Sockets, $Kernel, $CurrentSocket, $AltDB;
+	public $PREFIX, $PREFIX_Cache, $SocketType='sqlite3', $Type='objective-sqlite', $Debug=false, $Version='tuxSQLite 0.2';
 
 	public function __construct ( &$Params, &$Kernel )
 	{
@@ -16,9 +16,17 @@ class tuxSQLite extends KernelModule
 			throw new Exception($this->Version. '::E_ERROR::ConnectDB:__construct: $CFG[\'db\'] in config.php or #2 parametr of modprobe is not an array');
 		}
 
-		$this->ConnectDB($Params[0]['db']['db']);
+		//$this->ConnectDB($Params[0]['db']['db']);
+
+		// create new default socket
+		$this -> Sockets['default'] = new SQLite3($Params[0]['db']['db']);
+		$this -> CurrentSocket = 'default';
+
 		$this -> PREFIX = $Params[0]['db']['prefix'];
-		$this -> state = 'ready';
+		$this -> Debug = @$Params[0]['db']['debug'];
+
+		// alternative sockets
+		$this -> AltDB = $Params[0]['db']['alt'];
 
 		$Kernel -> setAsDefault ( 'sqlite', 'SQL' );
 	}
@@ -37,41 +45,77 @@ class tuxSQLite extends KernelModule
 
 	private function ConnectDB($DBName)
 	{
-		$Hash = md5($DBName);
-		$this -> Kernel -> error_handler -> logString ( $this->Version. '::E_ERROR::ConnectDB: Connecting to ' .$DBName. ' database.');
+		if(!isset($this->AltDB[$DBName]))
+			return false;
 
-		// i think its important to add this debugging information
-		if (!is_file($DBName))
+		$a = false;
+
+		// if its a prefix change
+		if(isset($this->AltDB[$DBName]['prefix']))
 		{
-			$this -> Kernel -> error_handler -> logString ( $this->Version. '::E_ERROR::ConnectDB: Database "' .$DBName. '" does not exists, created new database');
+			$a = true;
+			$this->PREFIX = $this->AltDB[$DBName]['prefix'];
 		}
 
-		// new connection
-		$this -> Sockets[$Hash] = new SQLite3 ($DBName);
+		// creating new connection to database
+		if(isset($this->AltDB[$DBName]['db']))
+		{
+			$this -> Kernel -> error_handler -> logString ( $this->Version. '::E_INFO::ConnectDB: Connecting to ' .$this->AltDB[$DBName]['db']. ' database.');
 
-		// set connection as default
-		$this->CurrentSocket = $Hash;
+			// i think its important to add this debugging information
+			if (!is_file($this->AltDB[$DBName]['db']))
+			{
+				$this -> Kernel -> error_handler -> logString ( $this->Version. '::E_ERROR::ConnectDB: Database "' .$this->AltDB[$DBName]['db']. '" does not exists, created new database');
+			}
 
-		return true;
+			// new connection
+			$this -> Sockets[$DBName] = new SQLite3 ($this->AltDB[$DBName]['db']);
+
+			// set connection as default
+			$this->CurrentSocket = $DBName;
+			$a = true;
+		}
+
+		return $a;
 	}
 
 	// we are able to connect to many databases at one time and switch between them
 	public function SwitchDB ($DBName)
 	{
-		$Hash = md5($DBName);
-
 		// if socket already exists we will just set it as default
 		if ($this->Sockets[$DBName])
 		{
-			$this->CurrentSocket = $Hash;
+			$this->CurrentSocket = $DBName;
 		} else {
 			// if socket does not exists, we will create it here
 			$this->ConnectDB($DBName);
 		}
 	}
 
+	public function SwitchPrefixForOneQuery($Prefix)
+	{
+		$this->PREFIX_Cache = $this->PREFIX;
+		$this->PREFIX = $Prefix;
+
+		return true;
+	}
+
+	public function RestorePrefix()
+	{
+		if($this->PREFIX_CACHE != false)
+		{
+			$this->PREFIX = $this->PREFIX_Cache;
+			$this->PREFIX_CACHE = false;
+		}
+	}
+
 	public function query ( $Query )
 	{
+		if($this->Debug != false)
+			$this->Kernel->error_handler->logString( $this->Version. '::E_DEBUG::query: Executing ' .$Query);
+
+		$this->RestorePrefix();
+
 		return $this -> Sockets [ $this -> CurrentSocket ] -> query ( $Query );
 	}
 
@@ -113,14 +157,13 @@ class tuxSQLite extends KernelModule
 	
 	}
 
-	//# UPDATE `users` SET `id`="1" WHERE `name`="Damian" ORDER BY `id` ASC LIMIT 1,1
-	//# WARNING! NO PREFIX IS USED HERE
+	//# UPDATE `users` SET `id`="1" WHERE `name`="Dawid" ORDER BY `id` ASC LIMIT 1,1
 	public function Update ( $What, $Set, $Where='', $OrderBy='', $POS='', $LimitFrom='', $LimitTo='' )
 	{
 		$Set = $this->convertWhere($Set);
-
 		//# WARNING! NO PREFIX IS USED HERE!
-		$SQL = 'UPDATE `' .$this->DB->escapeString($What). '` SET ' .$Set;
+		$SQL = 'UPDATE `' .$this->PREFIX.$this->DB->escapeString($What). '` SET ' .$Set;
+
 
 		//# Where
 		if ( $Where != '' )
@@ -151,31 +194,26 @@ class tuxSQLite extends KernelModule
 		return new tuxMyDB_Object ( $this->query($SQL) );
 	}
 
-	//# DELETE FROM `users` WHERE `id`="1"
-	public function Delete ($What='', $From, $Where='', $OrderBy='', $POS='', $LimitFrom='', $LimitTo='')
+	//# INSERT INTO `table` (`id`, `test`) VALUES (1, 'blahblah')
+	public function Insert ($What='', $Fields, $Values)
 	{
-		$What = $this->convertWhat ( $What );
+		$SQL = 'INSERT INTO `' .$this->PREFIX.$this->DB->escapeString($What). '` (' .$this->convertFields($Fields). ') VALUES (' .$this->convertFields($Values). ');';
 
-		$SQL = 'DELETE ' .$What. ' FROM `' .$this->DB->escapeString($From). '`';
+		return new tuxMyDB_Object ( $this->query($SQL) );
+	}
+
+
+	//# DELETE FROM `users` WHERE `id`="1"
+	public function Delete ($From, $Where='', $LimitFrom='', $LimitTo='')
+	{
+
+		$SQL = 'DELETE FROM `' .$this->PREFIX.$this->DB->escapeString($From). '`';
 
 		//# Where
 		if ( $Where != '' )
 		{
 			$Where = $this->convertWhere ( $Where );
 			$SQL .= ' WHERE ' .$Where;
-		}
-
-		//# OrderBy and POS
-		if ( $OrderBy != '' )
-		{
-			$OrderBy = $this->convertWhat($OrderBy);
-			$SQL .= ' ORDER BY ' .$OrderBy;
-
-			//# Pos ( ASC, DESC )
-			if ( $POS == 'DESC' )
-				$SQL .= ' DESC'; # DESCENDING 
-			else
-				$SQL .= ' ASC'; # ASCENDING ( DEFAULT )
 		}
 
 		//# Limit
@@ -272,11 +310,38 @@ class tuxSQLite extends KernelModule
 		}
 	}
 
+	/* CONVERT ARRAY TO FIELDS/VALUES SYNTAX IN SQL LANGUAGE, example: input - array('id', 'name') or values input - array(1, 'Anna') */
+	public function convertFields ($Array)
+	{
+		$TotalFields = count($Array);
+		$Position = 0;
+		foreach ($Array as $Key => $Value)
+		{
+			$Position++;
+
+			if($Value == NuLL OR $Value == "NULL")
+				$SQL .= 'NULL';
+			elseif(is_numeric($Value))
+				$SQL .= $Value; 
+			elseif(is_int($Value))
+				$SQL .= $Value;
+			else
+				$SQL .= '"' .$this->DB->escapeString($Value). '"';
+
+			if($Position == $TotalFields)
+				continue;
+
+			$SQL .= ',';
+		}
+
+		return $SQL;
+	}
+
 	public function convertWhere ( &$What )
 	{
 		if ( get_class ( $What ) != 'tuxMyDB_WhereClause' )
 		{
-			$this -> Kernel -> error_handler -> logString ( $this->Version. '::E_ERROR::convertWhat: Invalid Where Clause type "' .get_class($What));
+			$this -> Kernel -> error_handler -> logString ( $this->Version. '::E_ERROR::convertWhere: Invalid Where Clause type "' .get_class($What));
 			return false;
 		}
 
@@ -296,7 +361,7 @@ class tuxSQLite extends KernelModule
 
 class tuxMyDB_Object
 {
-	private $Resource, $AssocArray;
+	private $Resource, $AssocArray=NuLL;
 
 	public function __construct ( $SQL  )
 	{
@@ -305,10 +370,13 @@ class tuxMyDB_Object
 
 	public function __get ( $Variable )
 	{
+		if($this->Resource == false)
+			return false;
+
 		switch ( $Variable )
 		{
 			case 'fetch_assoc':
-				if (empty($this->AssocArray))
+				if (is_null($this->AssocArray))
 				{
 					$i=0;
 					while ($Entry = $this->Resource->fetchArray(SQLITE3_ASSOC))
@@ -321,11 +389,10 @@ class tuxMyDB_Object
 					if ($i == 1)
 					{
 						unset($i);
-						unset ($Array);
-						return $Entry;
+						return $Array[0];
 					}
+					
 
-					var_dump($Array);
 					return $Array;
 				} else {
 					return $this->AssocArray;				
@@ -348,8 +415,6 @@ class tuxMyDB_Object
 				} else {
 					$this->AssocArray = $Array;				
 				}
-
-				
 
 				unset($Array);
 
@@ -385,9 +450,13 @@ class tuxMyDB_WhereClause
 
 	public function Add ( $Statement, $Column, $Equals, $Value )
 	{
-		$Equals_list = array ( '=' , '!=', '<', '>', '<=', '>=' );
+		$Equals_list = array ( '=' , '!=', '<', '>', '<=', '>=', 'LIKE' );
+
 		if ( !in_array ( $Equals, $Equals_list ) ) //# Needle, haystack...
 			return false;
+
+		if ($Equals == 'LIKE')
+			$Equals = ' LIKE '; // to be valid with syntax
 
 		$Statement_list = array ( 'OR', 'AND', '', ',' );
 	

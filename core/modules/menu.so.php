@@ -39,7 +39,10 @@ class libmenu extends KernelModule
 
 			//# ===== GET THE MENU FROM TRANSLATION
 			$this->alang->loadTranslation($TranslationName);
-			$MenuList = $this->alang->$TranslationName;	
+			$MenuList = $this->alang->$TranslationName;
+
+			// binding to change menu by other plugins
+			$Kernel -> hooks -> startHook ( 'menu_array', $MenuList );
 		}
 		
 		$this->tpl->assign('menu', $MenuList);

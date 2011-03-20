@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `prefix_admin` (
 --
 
 INSERT INTO `prefix_admin` (`id`, `name`, `passwd`, `privigle`, `restrictip`, `disabled`, `unblock_time`) VALUES
-(1, 'admin', 'test-password-here-in-md5', 10, '', 0, 0);
+(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 10, '', 0, 0);
 
 -- --------------------------------------------------------
 

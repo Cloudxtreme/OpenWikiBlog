@@ -62,7 +62,7 @@ class libsmarty extends KernelModule
 		{
 			$Params['cache_lifetime'] = 100;
 
-			$this -> Debug -> logString ( 'smarty.so.php::E_WARNING::FixParams:  Fixing invalid cache_lifetime parametr');
+			$this -> Debug -> logString ( 'smarty.so.php::E_WARNING::FixParams: Fixing invalid cache_lifetime parametr');
 		}
 
 		if ( !is_bool ( $Params['caching'] ) )
@@ -81,6 +81,21 @@ class libsmarty extends KernelModule
 	{
 		$this->Debug->logString ( 'smarty.so.php::E_INFO::display: "' .$File. '"');
 		$this -> tpl -> display ( $File );
+	}
+
+	// automaticaly add variables with values from array given in first argument
+	public function fillFromArray($Array)
+	{
+		if(!is_array($Array))
+		{
+			$this->Debug->logString ( 'smarty.so.php::E_ERROR::fillFromArray: Specified argument is not an array');
+			return false;
+		}
+
+		foreach ($Array as $Key => $Value)
+		{
+			$this->assign($Key,$Value); // this is so simple!
+		}
 	}
 }
 ?>

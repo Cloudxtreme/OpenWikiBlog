@@ -20,15 +20,17 @@ rm OpenWikiBlog.zip
 
 - When you downloaded copy of OpenWikiBlog repository and extracted it now you have to set needed to work chmods (file privileges):
 
-777 - data/crash
-777 - data/db
-777 - data/templates_c
+755 - data/crash
+755 - data/db
+755 - data/templates_c
+755 - data/cache
+755 - data/cache/kernel
+755 - data/tmp
 
 You can do it by your FTP client or by typing these commands in Terminal:
 
-chmod -R 777 data/crash
-chmod -R 777 data/db
-chmod -R 777 data/templates_c
+chown www-data data/crash data/db data/templates_c data/tmp data/cache -R
+chmod -R 755 data/crash data/db data/templates_c
 
 - Now everything is working and ready to work.
 Congratulations.

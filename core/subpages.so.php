@@ -53,6 +53,7 @@ class Subpage
 
 			if ( $Error [ 'nice' ] < -4 )
 			{
+				
 				$this-> Kernel -> error_handler -> TriggerCrash ( $Errors );
 			}
 
@@ -71,9 +72,11 @@ class Subpage
 		{
 			$Error = $this->Kernel->error_handler->Analyze($e);
 
+			$Errors[] = $Error;
+
 			if ( $Error [ 'nice' ] < -4 )
 			{
-				$this->Kernel->error_handler->TriggerCrash($Error);
+				$this->Kernel->error_handler->TriggerCrash($Errors);
 			}
 
 		}

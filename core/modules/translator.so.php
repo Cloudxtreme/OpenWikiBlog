@@ -82,6 +82,12 @@ class libtranslate extends KernelModule
 
 	public function loadTranslation($File)
 	{
+		// already loaded
+		if($this->isLoaded($File))
+		{
+			return true;
+		}
+
 		// security... never, never trust user or third party module developer ;-)
 		$File = addslashes ( $File );
 

@@ -9,7 +9,7 @@ class libmypage extends KernelModule
 {
 	# this is a plugin current state, kernel must check if the module is ready to use
 	public $state='module not ready';
-	private $Debug, $tpl, $DB, $Version='libmypage 1.1', $alang, $tplfile;
+	private $Debug, $tpl, $DB, $Version='libmypage 1.2', $alang, $tplfile;
 
 	public function __construct ( $Params, &$Kernel )
 	{
@@ -28,7 +28,16 @@ class libmypage extends KernelModule
 
 		#### SQL QUERY
 		$WhereClause = new tuxMyDB_WhereClause ();
-		$WhereClause -> Add ('', 'id', '=', intval($_GET['page']) );
+
+		// SEO LINKS
+		if(isset($_GET['seo_id']))
+		{
+			$WhereClause -> Add ('', 'seo_name', '=', $_GET['seo_id'] );
+		} else {
+			$WhereClause -> Add ('', 'id', '=', intval($_GET['page']) );
+		}
+
+		
 		#$WhereClause -> Add ('AND', 'site', '=', $SITE ); # Multi-site feature cancelled
 		
 		# TEMPLATE: Select ( $What, $From, $Where='', $OrderBy='', $POS='ASC', $LimitFrom='', $LimitTo='' )
@@ -51,7 +60,7 @@ class libmypage extends KernelModule
 
 			include ( $INC_FILE );
 
-			$this->Debug->logString ( $this->Version. '::E_INFO::init: loading "' .$INC_FILE. '"(' .intval($_GET['page']). ')');
+			$this->Debug->logString ( $this->Version. '::E_INFO::init: loading "' .$INC_FILE. '"(' .intval($Page['id']). ')');
 		} else {
 			# DONT DELETE 404.php file, or it will show you an error ;-)
 			# "ITS NOT A BUG - ITS FEATURE" haha ;-)
@@ -64,9 +73,10 @@ class libmypage extends KernelModule
 			$TPL = &$this->tpl;
 			$LANG = &$this->alang;
 			$DB = &$this->DB;
+			$Kernel = &$this->Kernel;
 
 			include ( $INC_FILE );
-			$this->Debug->logString ( $this->Version. '::E_ERROR::init: 404 error, page ID:' .intval($_GET['page']). ' not found.');
+			$this->Debug->logString ( $this->Version. '::E_ERROR::init: 404 error, page ID:' .intval($_GET['page']). '/seo_id: ' .htmlspecialchars($_GET['seo_id']). ' not found.');
 		}
 
 		//$this -> tpl -> display ( $TPL_FILE );
