@@ -22,7 +22,7 @@ class tuxKernel
                 // make sure there are all passwords erased
                 unset ( $this->CFG );
 
-                return array ( 'private:apps' => $this->Apps, 'protected:Version' => $this->Version, 'private:Mods' => $this->Mods);
+                return array ( 'private:apps' => $this->Apps, 'private:Mods' => $this->Mods);
         }
 
         //# KEEP THIS FUNCTION SMALL AND FASTER, BECAUSE ITS CALLED ALL TIMES USING KERNEL

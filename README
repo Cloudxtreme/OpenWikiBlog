@@ -4,6 +4,10 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+16.04.2011:
+        tuxKernel:
+        - Removed version from ReturnSelfDumped()
+
 20.03.2011:
 	tuxKernel:
 	+ Integrated cache system
