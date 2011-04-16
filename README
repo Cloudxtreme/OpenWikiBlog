@@ -5,6 +5,10 @@
 #=============================================================
 
 16.04.2011 (Caching system):
+        libmypage:
+        + Caching system configurable via config.php ('cache_lifetime' = NUMBER)
+
+16.04.2011 (Caching system):
         tuxKernel:
         * Fixed cache system
 

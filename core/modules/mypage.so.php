@@ -20,36 +20,55 @@ class libmypage extends KernelModule
 		$this->tpl = $Kernel->tpl;
 		$this->alang = $Kernel->alang;
 
-		// if page is unset, set default one
-		if ( !isset ( $_GET['page'] ) )
-		{
-			$_GET['page'] = $Params['index'];
-		}
+		if (isset($_GET['seo_id']))
+			$PageID = 'mypage_' .$_GET['seo_id'];
+		else
+			$PageID = 'mypage_' .intval($_GET['page']);
 
-		#### SQL QUERY
-		$WhereClause = new tuxMyDB_WhereClause ();
-
-		// SEO LINKS
-		if(isset($_GET['seo_id']))
+		// if cache expired, lets regenerate new
+                if($this->Kernel->stringCacheExpired($PageID, $Params['cache_lifetime']) == True)
 		{
-			$WhereClause -> Add ('', 'seo_name', '=', $_GET['seo_id'] );
+			// if page is unset, set default one
+			if ( !isset ( $_GET['page'] ) )
+			{
+				$_GET['page'] = $Params['index'];
+			}
+
+			#### SQL QUERY
+			$WhereClause = new tuxMyDB_WhereClause ();
+
+			// SEO LINKS
+			if(isset($_GET['seo_id']))
+			{
+				$WhereClause -> Add ('', 'seo_name', '=', $_GET['seo_id'] );
+			} else {
+				$WhereClause -> Add ('', 'id', '=', intval($_GET['page']) );
+			}
+
+		
+			#$WhereClause -> Add ('AND', 'site', '=', $SITE ); # Multi-site feature cancelled
+		
+			# TEMPLATE: Select ( $What, $From, $Where='', $OrderBy='', $POS='ASC', $LimitFrom='', $LimitTo='' )
+			$Q = $this->DB->Select( '*', 'libmypage', $WhereClause, '', '', 0,1);
+
+			unset ( $WhereClause ); //# FREE THE OBJECT!
+
+			if ($Q -> num_rows == 1)
+			{
+				$Page = $Q -> fetch_assoc;
+
+				// IF CACHING IS ENABLED IN LIBMYPAGE
+				if($Params['cache_lifetime'] > 0)
+				{
+					$this->Kernel->stringCacheWrite($PageID, $Page);
+				}
+			}
 		} else {
-			$WhereClause -> Add ('', 'id', '=', intval($_GET['page']) );
+			$Page = $this->Kernel->stringCacheRead($PageID);
 		}
 
-		
-		#$WhereClause -> Add ('AND', 'site', '=', $SITE ); # Multi-site feature cancelled
-		
-		# TEMPLATE: Select ( $What, $From, $Where='', $OrderBy='', $POS='ASC', $LimitFrom='', $LimitTo='' )
-		$Q = $this->DB->Select( '*', 'libmypage', $WhereClause, '', '', 0,1);
-
-		unset ( $WhereClause ); //# FREE THE OBJECT!
-
-
-		if ( $Q -> num_rows == 1 )
+		if ( count($Page) > 0 )
 		{
-			$Page = $Q -> fetch_assoc;
-			
 			$INC_FILE = 'data/pages/' .$Page['include']. '.php';
 			$TPL_FILE = $Page['template'];
 
