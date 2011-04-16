@@ -5,7 +5,7 @@ class tuxKernel
         //public $SQL; // WE WILL KEEP DATABASE OBJECT HERE...
         private $CFG;
         public $Version='tuxKernel 0.32';
-        private $Apps, $LastModule, $cacheString;
+        private $Apps, $LastModule, $stringCache;
         
         // ===== Where are framework core files?
         public $LD_LIBRARY_PATH='';
@@ -352,19 +352,20 @@ class tuxKernel
 	{
 		$this->cacheLoad();
 
-		if(isset($this->cacheString[$String]))
+		if(isset($this->stringCache[$String]))
 		{
-			if(($this->cacheString[$String]['time']+$LifeTime) >= mktime())
+			if(($this->stringCache[$String]['time']+$LifeTime) > mktime())
 			{
-				return true;
-			}
+				return False;
+			} else
+				return True;
 		} else
 			return true;
 	}
 
 	public function stringCacheRead($String)
 	{
-		return $this->cacheString[$String]['content'];
+		return $this->stringCache[$String]['content'];
 	}
 
 	public function fileCacheLoad($File)
@@ -404,27 +405,43 @@ class tuxKernel
 	private function cacheLoad()
 	{
 		// load cache only one time
-		if(!isset($this->cacheString))
+		if(!isset($this->stringCache))
 		{
 			if(is_file('data/cache/kernel/stringCache'))
 			{
-				$Unserialized = file_get_contents(unserialize('data/cache/kernel/stringCache'));
+				$Unserialized = unserialize(file_get_contents('data/cache/kernel/stringCache'));
 
 				if(!is_array($Unserialized))
 					$Unserialized = array();
 
-				$this->cacheString = $Unserialized;
+				$this->stringCache = $Unserialized;
+			} else {
+				if(is_writable('data/cache/kernel/'))
+				{
+					stringCacheMake();
+					if ( isset ( $this->Apps['error_handler'] ) )
+				                $this -> error_handler -> logString ( 'kernel.so.php::E_INFO::cacheLoad: Created stringCache');
+				}
 			}
 		}
 	}
 
-	public function __destroy()
+	private function stringCacheMake()
+	{
+		if(!is_file('data/cache/kernel/stringCache'))
+		{
+			$fp = @fopen('data/cache/kernel/stringCache', 'w');
+			@fwrite($fp, serialize(array()));
+			@fclose($fp);
+		}
+	}
+
+	public function __destruct()
 	{
 		// save cache to stringArray file
 		if(is_array($this->stringCache))
 		{
 			$fp = fopen('data/cache/kernel/stringCache', 'r+');
-
 			if (@flock($fp, LOCK_EX))
 			{
 				ftruncate($fp, 0);
@@ -438,15 +455,10 @@ class tuxKernel
 			@fclose($fp);
 		}
 	}
-
-	
-
-	
 }
 
 class KernelModule
 {
         private $Kernel=NuLL;
-        public $state='module not ready';
 }
 ?>

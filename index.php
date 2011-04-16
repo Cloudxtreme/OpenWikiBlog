@@ -12,4 +12,5 @@ $Subpage = new Subpage($PATH);
 $Subpage -> loadDefaultModules();
 $stModules = $Subpage->getModules();
 $Subpage -> modprobe(0, array( 'mypage', 'display', ''));
+$subpage -> Kernel -> __destruct();
 ?>
