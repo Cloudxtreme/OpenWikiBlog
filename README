@@ -4,6 +4,10 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+16.04.2011 (Databases):
+        tuxSQLite:
+        * Optimized SwitchDB()
+
 16.04.2011 (Caching system):
         libmypage:
         + Caching system configurable via config.php ('cache_lifetime' = NUMBER)

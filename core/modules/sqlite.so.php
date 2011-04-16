@@ -82,6 +82,9 @@ class tuxSQLite extends KernelModule
 	// we are able to connect to many databases at one time and switch between them
 	public function SwitchDB ($DBName)
 	{
+		if($this->CurrentSocket == $DBName)
+			return true;
+
 		// if socket already exists we will just set it as default
 		if ($this->Sockets[$DBName])
 		{
