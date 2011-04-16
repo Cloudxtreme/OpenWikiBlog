@@ -48,7 +48,7 @@ $CFG['mods']['smarty'] = array ( 'caching' => false,
 $CFG['mods']['translator'] = array ( 'default_language' => 'english' );
 
 // ===== Mypage will show current subpage using Smarty and Translator
-$CFG['mods']['mypage'] = array ( 'index' => 1 ); # show current sub-page
+$CFG['mods']['mypage'] = array ( 'index' => 1, 'cache_lifetime' => 120 ); # show current sub-page
 
 // ===== This module will easily create a menu with language support
 $CFG['mods']['menu'] = NuLL; # this will create our menu
