@@ -4,6 +4,10 @@
 #=== http://github.com/webnull/OpenWikiBlog
 #=============================================================
 
+17.04.2011 (Database):
+        tuxSQLite:
+        * Fixed error()
+
 16.04.2011 (Databases):
         tuxSQLite:
         * Optimized SwitchDB()

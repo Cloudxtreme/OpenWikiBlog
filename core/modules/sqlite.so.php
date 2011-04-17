@@ -356,9 +356,9 @@ class tuxSQLite extends KernelModule
 	{
 		// if error is serious
 		if ( !empty ( $this -> Socket -> connect_error ) )
-			return $this->Socket->connect_error;
+			return $this -> Sockets [ $this -> CurrentSocket ] ->connect_error;
 
-		return $this -> Socket -> error;
+		return $this -> Sockets [ $this -> CurrentSocket ] -> error;
 	}
 }
 
