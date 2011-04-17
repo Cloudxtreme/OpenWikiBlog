@@ -28,6 +28,9 @@ class tuxSQLite extends KernelModule
 		// alternative sockets
 		$this -> AltDB = $Params[0]['db']['alt'];
 
+		// default socket (just a binding)
+		$this->AltDB['default'] = array('prefix' => $Params[0]['db']['prefix']);
+
 		$Kernel -> setAsDefault ( 'sqlite', 'SQL' );
 	}
 
@@ -50,13 +53,6 @@ class tuxSQLite extends KernelModule
 
 		$a = false;
 
-		// if its a prefix change
-		if(isset($this->AltDB[$DBName]['prefix']))
-		{
-			$a = true;
-			$this->PREFIX = $this->AltDB[$DBName]['prefix'];
-		}
-
 		// creating new connection to database
 		if(isset($this->AltDB[$DBName]['db']))
 		{
@@ -76,6 +72,20 @@ class tuxSQLite extends KernelModule
 			$a = true;
 		}
 
+		// if its a prefix change
+		if(isset($this->AltDB[$DBName]['prefix']))
+		{
+			$this->PREFIX = $this->AltDB[$DBName]['prefix'];
+
+			if ($a == False)
+			{
+				$this->Sockets[$DBName] = &$this->Sockets[$this->CurrentSocket];
+				// set connection as default
+				$this->CurrentSocket = $DBName;
+				$a = true;
+			}
+		}
+
 		return $a;
 	}
 
@@ -89,6 +99,10 @@ class tuxSQLite extends KernelModule
 		if ($this->Sockets[$DBName])
 		{
 			$this->CurrentSocket = $DBName;
+
+			// set prefix if present
+			if(isset($this->AltDB[$DBName]['prefix']))
+				$this->PREFIX = $this->AltDB[$DBName]['prefix'];
 		} else {
 			// if socket does not exists, we will create it here
 			$this->ConnectDB($DBName);

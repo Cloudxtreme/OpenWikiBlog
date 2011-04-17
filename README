@@ -7,6 +7,7 @@
 17.04.2011 (Database):
         tuxSQLite:
         * Fixed error()
+	* Fixed multi-database support
 
 16.04.2011 (Databases):
         tuxSQLite:
